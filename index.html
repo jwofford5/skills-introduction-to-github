@@ -2,58 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>SWAT Tactical Simulator — Hostage Rescue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SWAT Tactical Simulator</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="app">
-    <header id="top-bar">
-      <div id="scenario-label">Hostage Rescue — Single Structure</div>
-      <div id="step-counter"><span id="step-current">1</span> / <span id="step-total">30</span></div>
+
+    <header id="header">
+      <div id="header-left">
+        <div id="scenario-title">Hostage Rescue</div>
+        <div id="scenario-sub">Single Structure · Linear Entry</div>
+      </div>
+      <div id="progress-wrap">
+        <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+        <div id="step-label">STEP <span id="step-num">1</span> <span id="step-of">OF</span> <span id="step-total">28</span></div>
+      </div>
     </header>
 
-    <main id="sim-main">
-      <div id="step-title">Stack at front door</div>
-      <div id="callout-bar">
-        <span id="callout-icon">📡</span>
-        <span id="callout-text">Awaiting initiation…</span>
-      </div>
+    <div id="map-wrap">
+      <svg id="map" viewBox="0 0 400 580" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g id="scene">
+          <g id="floor-layer"></g>
+          <g id="door-layer"></g>
+          <g id="angle-layer"></g>
+          <g id="label-layer"></g>
+          <g id="operator-layer"></g>
+        </g>
+      </svg>
+    </div>
 
-      <div id="floorplan-wrap">
-        <canvas id="floorplan" width="360" height="480"></canvas>
+    <div id="info-panel">
+      <div id="info-title"></div>
+      <div id="info-callout" class="hidden">
+        <span id="callout-tag">RADIO</span>
+        <span id="callout-text"></span>
       </div>
-
-      <div id="teaching-bar">
-        <span id="teaching-text"></span>
-      </div>
-    </main>
+      <div id="info-teaching"></div>
+    </div>
 
     <div id="controls">
-      <button id="btn-prev" class="ctrl-btn" aria-label="Previous">&#9664;</button>
-      <button id="btn-play" class="ctrl-btn primary" aria-label="Play">&#9654;</button>
-      <button id="btn-next" class="ctrl-btn" aria-label="Next">&#9654;&#9654;</button>
+      <button id="btn-prev" class="ctrl-btn" aria-label="Previous step">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button id="btn-play" class="ctrl-btn play-btn" aria-label="Play / Pause">
+        <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        <svg id="icon-pause" class="hidden" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+      <button id="btn-next" class="ctrl-btn" aria-label="Next step">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
 
-    <div id="overlay-toggles">
-      <button class="ov-btn active" data-ov="operators">Operators</button>
-      <button class="ov-btn" data-ov="angles">Angles</button>
-      <button class="ov-btn" data-ov="roles">Roles</button>
-      <button class="ov-btn" data-ov="notes">Notes</button>
+    <div id="legend-bar">
+      <div id="op-legend"></div>
+      <button id="btn-angles" class="legend-toggle">Angles</button>
     </div>
 
-    <div id="operator-tray" class="tray hidden">
-      <div id="tray-handle"><span>▼ Operators</span></div>
-      <div id="operator-list"></div>
-    </div>
-
-    <div id="role-sheet" class="bottom-sheet hidden">
-      <div class="sheet-header">
-        <span id="role-sheet-name"></span>
-        <button id="role-sheet-close">✕</button>
-      </div>
-      <div id="role-sheet-body"></div>
-    </div>
   </div>
 
   <script src="data.js"></script>
