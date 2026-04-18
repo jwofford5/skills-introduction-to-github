@@ -35,3 +35,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# here.now publish state (credentials and state are local only)
+.herenow/
