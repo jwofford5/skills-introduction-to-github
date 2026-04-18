@@ -3,71 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SWAT Tactical Simulator</title>
+  <title>SWAT Tactical Movement</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="app">
 
-    <header id="header">
-      <div id="header-left">
-        <div id="scenario-title">Hostage Rescue</div>
-        <div id="scenario-sub">Single Structure · Linear Entry</div>
-      </div>
-      <div id="progress-wrap">
-        <div id="progress-bar-bg"><div id="progress-bar"></div></div>
-        <div id="step-label">STEP <span id="step-num">1</span> <span id="step-of">OF</span> <span id="step-total">28</span></div>
-      </div>
-    </header>
-
-    <div id="map-wrap">
-      <svg id="map" viewBox="0 0 400 580" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <g id="scene">
-          <g id="floor-layer"></g>
-          <g id="door-layer"></g>
-          <g id="angle-layer"></g>
-          <g id="label-layer"></g>
-          <g id="operator-layer"></g>
-        </g>
-      </svg>
+    <div id="top-bar">
+      <span id="site-label">SWAT MOVEMENT</span>
+      <span id="concept-counter"></span>
     </div>
 
-    <div id="info-panel">
-      <div id="info-title"></div>
-      <div id="info-callout" class="hidden">
-        <span id="callout-tag">RADIO</span>
-        <span id="callout-text"></span>
-      </div>
-      <div id="info-teaching"></div>
+    <div id="title-wrap">
+      <div id="concept-num-label">CONCEPT</div>
+      <div id="concept-title"></div>
     </div>
 
-    <div id="controls">
-      <button id="btn-prev" class="ctrl-btn" aria-label="Previous step">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button id="btn-play" class="ctrl-btn play-btn" aria-label="Play / Pause">
-        <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-        <svg id="icon-pause" class="hidden" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      </button>
-      <button id="btn-next" class="ctrl-btn" aria-label="Next step">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
+    <div id="visual-wrap">
+      <svg id="scene-svg" viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="radio-traffic" class="hidden"></div>
     </div>
 
-    <div id="legend-bar">
-      <div id="op-legend"></div>
-      <button id="btn-angles" class="legend-toggle">Angles</button>
+    <div id="text-wrap">
+      <p id="concept-body"></p>
+      <div id="concept-callout" class="callout-block hidden"></div>
+      <div id="concept-rule" class="rule-block hidden"></div>
+    </div>
+
+    <div id="nav-bar">
+      <button id="btn-prev" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div id="dots"></div>
+      <button id="btn-next" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
 
   </div>
-
-  <script src="data.js"></script>
-  <script src="simulator.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
