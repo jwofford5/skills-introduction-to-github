@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Working Memory &amp; Cognitive Architecture</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
+      line-height: 1.7;
+      color: #222;
+      background: #faf9f7;
+    }
+
+    header {
+      background: #2c3e2d;
+      color: #fff;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      font-size: 1.05rem;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    section { margin-bottom: 3.5rem; }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #2c3e2d;
+      border-bottom: 2px solid #4a7c59;
+      padding-bottom: 0.3rem;
+      margin-bottom: 1.2rem;
+    }
+
+    p { margin-bottom: 1rem; }
+
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      background: #fff;
+      border: 2px solid #4a7c59;
+      border-radius: 8px;
+      padding: 1rem 1.4rem;
+      text-align: center;
+      min-width: 140px;
+    }
+    .arch-box .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4a7c59;
+      font-family: Arial, sans-serif;
+      margin-bottom: 0.3rem;
+    }
+    .arch-box .name {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #2c3e2d;
+    }
+    .arch-box .detail {
+      font-size: 0.82rem;
+      color: #555;
+      font-family: Arial, sans-serif;
+      margin-top: 0.2rem;
+    }
+    .arch-arrow {
+      font-size: 1.8rem;
+      color: #4a7c59;
+      padding: 0 0.6rem;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat {
+      background: #fff;
+      border-left: 4px solid #4a7c59;
+      padding: 1rem 1.2rem;
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .stat .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #4a7c59;
+      line-height: 1.1;
+    }
+    .stat .unit {
+      font-size: 0.85rem;
+      font-family: Arial, sans-serif;
+      color: #666;
+    }
+    .stat .desc {
+      font-size: 0.9rem;
+      font-family: Arial, sans-serif;
+      color: #333;
+      margin-top: 0.3rem;
+    }
+
+    .channels {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .channel {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border: 2px solid #4a7c59;
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+    .channel h3 {
+      font-size: 1rem;
+      color: #2c3e2d;
+      margin-bottom: 0.5rem;
+    }
+    .channel p {
+      font-size: 0.9rem;
+      font-family: Arial, sans-serif;
+      color: #444;
+      margin: 0;
+    }
+    .channel .icon {
+      font-size: 2rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .examples { display: flex; flex-direction: column; gap: 1rem; }
+    .example {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.1rem 1.4rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 0.8rem;
+      align-items: start;
+    }
+    .example .emoji {
+      font-size: 1.6rem;
+      line-height: 1;
+      padding-top: 0.1rem;
+    }
+    .example h3 {
+      font-size: 1rem;
+      color: #2c3e2d;
+      margin-bottom: 0.2rem;
+    }
+    .example p {
+      font-size: 0.9rem;
+      font-family: Arial, sans-serif;
+      color: #444;
+      margin: 0;
+    }
+
+    .takeaways { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .takeaways li {
+      background: #eef5f0;
+      border-left: 4px solid #4a7c59;
+      padding: 0.9rem 1.2rem;
+      border-radius: 0 6px 6px 0;
+      font-family: Arial, sans-serif;
+      font-size: 0.95rem;
+      color: #222;
+    }
+    .takeaways li strong { color: #2c3e2d; }
+
+    footer {
+      background: #2c3e2d;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      font-family: Arial, sans-serif;
+    }
+    footer em { color: rgba(255,255,255,0.9); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Working Memory &amp; Cognitive Architecture</h1>
+  <p>From Cognitive Load Theory &mdash; Sweller, Ayres &amp; Kalyuga (2011)</p>
+</header>
+
+<main>
+
+  <section>
+    <h2>Why Cognitive Architecture Matters</h2>
+    <p>
+      Without knowledge of how the human mind processes information, instructional
+      design is blind. We can observe that some teaching methods work and others do not,
+      but without an underlying model of cognition we cannot explain why, predict when
+      they will generalise, or systematically improve them.
+    </p>
+    <p>
+      Cognitive Load Theory is built on a specific model of <strong>human cognitive
+      architecture</strong> — the structures and processes that govern how we take in,
+      hold, and permanently store knowledge. That architecture has two central
+      components: <em>long-term memory</em> and <em>working memory</em>.
+    </p>
+
+    <div class="arch-diagram" role="img" aria-label="Information flow from sensory input through working memory to long-term memory">
+      <div class="arch-box">
+        <div class="label">Environment</div>
+        <div class="name">Sensory Input</div>
+        <div class="detail">Visual &amp; auditory</div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">&#8594;</div>
+      <div class="arch-box">
+        <div class="label">Bottleneck</div>
+        <div class="name">Working Memory</div>
+        <div class="detail">Limited &amp; temporary</div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">&#8596;</div>
+      <div class="arch-box">
+        <div class="label">Permanent Store</div>
+        <div class="name">Long-Term Memory</div>
+        <div class="detail">Unlimited &amp; lasting</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Long-Term Memory: The Unlimited Store</h2>
+    <p>
+      Long-term memory is the foundation of expertise. It holds an essentially
+      <strong>unlimited</strong> amount of information for an <strong>unlimited</strong>
+      duration. Everything you know — from how to ride a bicycle, to the rules of grammar,
+      to the layout of your home — lives there.
+    </p>
+    <p>
+      Information in long-term memory is organised into <em>schemas</em>: mental
+      structures that group related elements into a single unit. A chess grandmaster does
+      not see 32 individual pieces on a board &mdash; they see familiar formations,
+      each stored as one schema. This bundling is what enables expert performance.
+    </p>
+    <p>
+      The ultimate goal of instruction is to help learners build rich, accurate schemas
+      in long-term memory. Once a schema is stored, it can be retrieved into working
+      memory and used almost effortlessly.
+    </p>
+  </section>
+
+  <section>
+    <h2>Working Memory: The Bottleneck</h2>
+    <p>
+      Working memory is where conscious thought happens. It processes incoming
+      information from the senses and retrieves information from long-term memory.
+      But when handling <em>novel</em> information — material that has not yet been
+      stored as a schema — working memory is severely constrained in two ways:
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="number">~4</div>
+        <div class="unit">items (Cowan, 2001)</div>
+        <div class="desc"><strong>Storage capacity</strong> for novel items. Earlier estimates were 7&plusmn;2 (Miller, 1956), but lower figures emerge for active processing.</div>
+      </div>
+      <div class="stat">
+        <div class="number">2&ndash;3</div>
+        <div class="unit">novel elements</div>
+        <div class="desc"><strong>Processing capacity.</strong> When elements must be organised or compared, the usable limit is even lower than storage capacity.</div>
+      </div>
+      <div class="stat">
+        <div class="number">&lt;20s</div>
+        <div class="unit">without rehearsal</div>
+        <div class="desc"><strong>Duration.</strong> Novel information disappears in under 20 seconds unless actively rehearsed (Peterson &amp; Peterson, 1959).</div>
+      </div>
+    </div>
+
+    <p>
+      These limits are not design flaws. They arise from a fundamental constraint:
+      when encountering something genuinely new, the mind must explore possible
+      ways to organise it. With just three elements there are only 6 permutations to
+      consider; with ten elements there are over 3.6 million. Keeping working memory
+      small keeps this combinatorial explosion manageable.
+    </p>
+    <p>
+      Working memory can also be equated with <em>consciousness itself</em>: you are
+      only directly aware of what is currently in working memory. Everything else in
+      long-term memory exists below the threshold of awareness until retrieved.
+    </p>
+  </section>
+
+  <section>
+    <h2>Two Channels, Not One</h2>
+    <p>
+      Working memory is not a single bucket. Following Baddeley's influential model,
+      it contains at least two partially independent processors that correspond to the
+      <em>modality</em> of incoming information:
+    </p>
+    <div class="channels">
+      <div class="channel">
+        <span class="icon" aria-hidden="true">&#128065;</span>
+        <h3>Visual-Spatial Sketchpad</h3>
+        <p>Handles images, diagrams, spatial layouts, and written text processed visually.</p>
+      </div>
+      <div class="channel">
+        <span class="icon" aria-hidden="true">&#128266;</span>
+        <h3>Auditory / Phonological Loop</h3>
+        <p>Handles spoken words, sounds, and inner speech (mentally "sounding out" text).</p>
+      </div>
+    </div>
+    <p>
+      Because the two channels are partially independent, presenting information
+      across both simultaneously can <strong>expand effective working memory
+      capacity</strong>. A diagram explained by spoken narration uses both channels;
+      a diagram with identical on-screen text competes with itself in the visual channel
+      and can overload it — a key insight behind several cognitive load effects.
+    </p>
+  </section>
+
+  <section>
+    <h2>The Expert Advantage: When Limits Disappear</h2>
+    <p>
+      The capacity and duration limits of working memory apply only to <em>novel</em>
+      information obtained from the environment. When working memory retrieves
+      previously organised schemas from long-term memory, those limits
+      <strong>effectively vanish</strong>.
+    </p>
+    <p>
+      A schema, however complex, counts as a single element in working memory.
+      An expert radiologist scanning an X-ray is not processing hundreds of
+      individual features; they retrieve a handful of high-level patterns stored
+      as schemas. This is why expertise makes previously impossible tasks feel trivial
+      &mdash; not because working memory has grown, but because long-term memory
+      now does most of the work.
+    </p>
+    <p>
+      This has a direct instructional implication: the more schemas a learner builds,
+      the freer their working memory becomes to handle genuinely new material. Instruction
+      that accelerates schema formation is instruction that expands functional cognition.
+    </p>
+  </section>
+
+  <section>
+    <h2>Practical Examples</h2>
+    <div class="examples">
+      <div class="example">
+        <div class="emoji" aria-hidden="true">&#128222;</div>
+        <div>
+          <h3>Dialling an Unfamiliar Phone Number</h3>
+          <p>
+            You look up a number you've never seen, then walk to the phone. By the time
+            you get there, it's gone. This is working memory's duration limit (~20 s)
+            in action. You solve it by rehearsing the number aloud — keeping it alive in
+            the phonological loop. With a number you dial every day, no rehearsal is
+            needed: a schema in long-term memory handles it instantly.
+          </p>
+        </div>
+      </div>
+      <div class="example">
+        <div class="emoji" aria-hidden="true">&#128663;</div>
+        <div>
+          <h3>Learning to Drive vs. Driving as an Expert</h3>
+          <p>
+            A new driver must consciously track steering, mirrors, pedals, speed, and
+            traffic simultaneously — often hitting the processing limit of 2&ndash;3 novel
+            elements. An experienced driver has bundled all those sub-tasks into automatic
+            schemas, freeing working memory to hold a conversation, navigate, or react to
+            the unexpected. Nothing physiological changed; long-term memory did the work.
+          </p>
+        </div>
+      </div>
+      <div class="example">
+        <div class="emoji" aria-hidden="true">&#9822;</div>
+        <div>
+          <h3>Novice vs. Expert Chess Player</h3>
+          <p>
+            In a classic experiment, chess masters and beginners were briefly shown a
+            mid-game board, then asked to reconstruct it. Masters recalled nearly every
+            piece; beginners remembered only a handful. When the same pieces were placed
+            <em>randomly</em> (no real game pattern), masters were no better than beginners.
+            Masters don't have better working memories — they have thousands of
+            board-position schemas in long-term memory, each retrieved as a single chunk.
+          </p>
+        </div>
+      </div>
+      <div class="example">
+        <div class="emoji" aria-hidden="true">&#128506;</div>
+        <div>
+          <h3>Reading a Map While Listening to Directions</h3>
+          <p>
+            Studying a road map (visual channel) while a passenger reads directions aloud
+            (auditory channel) is manageable. Trying to read the directions on-screen
+            <em>and</em> study the map simultaneously forces both tasks into the same
+            visual channel, rapidly overloading it. Using both channels in parallel
+            exploits the partial independence of working memory's processors and
+            reduces overall cognitive load.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Instructional Takeaways</h2>
+    <ul class="takeaways">
+      <li>
+        <strong>Respect the bottleneck.</strong> Novice learners cannot process more
+        than 2&ndash;3 novel concepts simultaneously. Break complex material into
+        smaller steps and present them sequentially rather than all at once.
+      </li>
+      <li>
+        <strong>Build schemas deliberately.</strong> The goal of every lesson is to
+        move organised knowledge into long-term memory. Activities that build schemas
+        — worked examples, guided practice, spaced retrieval — directly expand the
+        learner's effective cognitive capacity over time.
+      </li>
+      <li>
+        <strong>Use both channels.</strong> Where possible, pair visual material
+        (diagrams, animations) with spoken explanation rather than on-screen text.
+        This distributes the load across both processors and avoids overloading
+        the visual channel.
+      </li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <p>Based on: <em>Cognitive Load Theory</em> &mdash; John Sweller, Paul Ayres &amp; Slava Kalyuga</p>
+  <p>Explorations in the Learning Sciences, Instructional Systems and Performance Technologies, Springer, 2011.</p>
+</footer>
+
+</body>
+</html>
