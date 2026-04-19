@@ -1,6 +1,6 @@
 'use strict';
-const SCALE = 40; // px per meter
-const OFFSET = { x: 80, y: 30 }; // canvas offset so exterior (negative x) is visible
+const SCALE = 30; // px per meter
+const OFFSET = { x: 210, y: 20 }; // exterior stack visible left of x=0
 
 function px(m) { return m * SCALE; }
 function cx(xm) { return OFFSET.x + xm * SCALE; }
@@ -72,27 +72,30 @@ function getState(time) {
 // ── Drawing functions ─────────────────────────────────────────────────────────
 
 function drawFloorPlan() {
-  // Exterior fill
+  // Dark background = wall mass / exterior
   ctx.fillStyle = '#050a10';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Rooms
+  // Exterior label
+  ctx.fillStyle = '#0d1520';
+  ctx.font = '500 10px system-ui,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('EXTERIOR', 18, 8);
+
+  // Room interiors (slightly inset to show wall thickness via dark gaps)
+  const W = 3; // wall half-thickness in px
   for (const r of ROOMS) {
+    const rx = cx(r.x) + W, ry = cy(r.y) + W;
+    const rw = px(r.w) - W*2,  rh = px(r.h) - W*2;
     ctx.fillStyle = '#0f1c2e';
-    ctx.fillRect(cx(r.x), cy(r.y), px(r.w), px(r.h));
+    ctx.fillRect(rx, ry, rw, rh);
     // Room label
-    ctx.fillStyle = '#1a3550';
-    ctx.font = '600 11px system-ui,sans-serif';
+    ctx.fillStyle = '#1e3a58';
+    ctx.font = '600 10px system-ui,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(r.label, cx(r.x + r.w/2), cy(r.y + r.h/2));
-  }
-
-  // Wall grid lines (room borders = wall edges)
-  ctx.strokeStyle = '#1e3048';
-  ctx.lineWidth = 1;
-  for (const r of ROOMS) {
-    ctx.strokeRect(cx(r.x), cy(r.y), px(r.w), px(r.h));
   }
 }
 
@@ -146,16 +149,11 @@ function drawDoors(simTime) {
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Swing arc (always shown)
-    const sweep = d.cw ? 1 : 0;
-    ctx.beginPath();
-    ctx.moveTo(closedX, closedY);
-    // SVG-style arc using canvas arc
+    // Swing arc (always shown) — canvas arc: anticlockwise=true means CCW on screen
     const startAngle = Math.atan2(closedY - hy, closedX - hx);
-    const endAngle = Math.atan2(openY - hy, openX - hx);
-    ctx.arc(hx, hy, len, startAngle, endAngle, sweep === 0);
-    ctx.strokeStyle = color.replace(')', ', 0.35)').replace('rgb', 'rgba').replace('#', 'rgba(').replace(/rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2}), 0\.35\)/, (_, r, g, b) =>
-      `rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},0.35)`);
+    const endAngle   = Math.atan2(openY   - hy, openX   - hx);
+    ctx.beginPath();
+    ctx.arc(hx, hy, len, startAngle, endAngle, !d.cw); // cw=true → anticlockwise=false
     ctx.strokeStyle = color + '60';
     ctx.lineWidth = 1.2;
     ctx.setLineDash([3, 2]);

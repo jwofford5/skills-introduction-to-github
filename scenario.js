@@ -1,5 +1,5 @@
 'use strict';
-// All positions in meters. Scale: 40px/m. Canvas 700×520 → 17.5m × 13m
+// All positions in meters. Scale: 30px/m, OFFSET x=210 y=20. Canvas 700×520.
 // Origin (0,0) = top-left of building interior.
 // Operators stack from x = -0.5 going left (exterior wall is at x=0).
 
@@ -22,15 +22,20 @@ const ROOMS = [
 ];
 
 // Door: {id, hx, hy, len, closedDeg, cw, state, roomBeyond, normal}
-// closedDeg: direction panel points when CLOSED (0=up,90=right,180=down,270=left)
-// cw: panel swings clockwise (on screen, y-down) to reach open position
-// normal: degrees the muzzle faces TO ENTER the room
+// closedDeg: direction panel points when lying in wall gap (closed)
+// cw: panel swings CW on screen to reach open position
+// normal: muzzle direction to enter the room (0=N,90=E,180=S,270=W)
 const DOORS = [
-  {id:'front',    hx:0,   hy:1.5, len:1.2, closedDeg:0,   cw:false, state:'closed', roomBeyond:'living',   normal:90,  clearAt:6},
+  // Front door: left wall (x=0), hinge at top of gap, panel closes downward, opens east (CCW)
+  {id:'front',    hx:0,   hy:1.5, len:1.2, closedDeg:180, cw:false, state:'closed', roomBeyond:'living',   normal:90,  clearAt:6},
+  // Closed-right: north wall of hallway (y=4.5), panel closes eastward, opens north (CCW)
   {id:'closed-r', hx:8.5, hy:4.5, len:1,   closedDeg:90,  cw:false, state:'closed', roomBeyond:'kitchen',  normal:0,   clearAt:18},
-  {id:'closed-l', hx:3,   hy:6.5, len:1,   closedDeg:270, cw:true,  state:'closed', roomBeyond:'lastroom', normal:180, clearAt:22},
-  {id:'lastroom', hx:0,   hy:6.5, len:1,   closedDeg:90,  cw:false, state:'open',   roomBeyond:'lastroom', normal:180, clearAt:26},
-  {id:'bathroom', hx:7,   hy:10,  len:1,   closedDeg:270, cw:true,  state:'closed', roomBeyond:'bathroom', normal:90,  clearAt:38},
+  // Closed-left: south wall of hallway (y=6.5), panel closes westward, opens south (CCW)
+  {id:'closed-l', hx:3,   hy:6.5, len:1,   closedDeg:270, cw:false, state:'closed', roomBeyond:'lastroom', normal:180, clearAt:22},
+  // Last room door: south wall end of hallway, panel closes eastward, opens south (CW)
+  {id:'lastroom', hx:0,   hy:6.5, len:1,   closedDeg:90,  cw:true,  state:'open',   roomBeyond:'lastroom', normal:180, clearAt:26},
+  // Bathroom: north wall of bathroom (y=10), panel closes westward, opens south (CCW)
+  {id:'bathroom', hx:7,   hy:10,  len:1,   closedDeg:270, cw:false, state:'closed', roomBeyond:'bathroom', normal:90,  clearAt:38},
 ];
 
 // ── Operator helper ────────────────────────────────────────────────────────────
