@@ -65,27 +65,29 @@ const KEYFRAMES = [
     }
   },
 
-  { time:9, label:'Chris stops short — Mags button-hooks', annotation:null, bang:false,
+  // Chris goes STRAIGHT east (limited penetration), stops and checks north corner.
+  // Mags BUTTON HOOKS — curves south along the door jamb, checks south corner.
+  { time:9, label:'Chris straight — Mags button-hooks', annotation:null, bang:false,
     ops:{
-      Chris: op({x:1.2,y:0.9}, 135,'dominating',    null,65,'right-shoulder','on-target'),
-      Mags:  op({x:1.2,y:2.2}, 225,'dominating',    null,65,'left-shoulder', 'on-target'),
-      Manny: op({x:0.5,y:1.5},  90,'moving',        null,45,'none','on-target'),
+      Chris: op({x:1.5,y:1.8},   0,'dominating',    null,60,'right-shoulder','on-target'),
+      Mags:  op({x:0.8,y:3.6}, 330,'dominating',    null,60,'left-shoulder', 'on-target'),
+      Manny: op({x:0.3,y:2.1},  90,'moving',        null,40,'none','on-target'),
     }
   },
 
-  { time:12, label:'Angle adjustment — muzzles shift for stack passage', annotation:null, bang:false,
+  { time:12, label:'Angle adjustment — muzzles shift for Manny', annotation:null, bang:false,
     ops:{
-      Chris: op({x:1.5,y:0.7},  55,'dominating',    null,55,'right-shoulder','on-target'),
-      Mags:  op({x:1.5,y:2.4}, 150,'dominating',    null,55,'left-shoulder', 'on-target'),
-      Manny: op({x:2.5,y:1.5},  90,'moving',        null,45,'none','on-target'),
+      Chris: op({x:1.5,y:1.5},  45,'dominating',    null,55,'right-shoulder','on-target'),
+      Mags:  op({x:1.2,y:3.8}, 315,'dominating',    null,55,'left-shoulder', 'on-target'),
+      Manny: op({x:2.5,y:2.2},  90,'moving',        null,40,'none','on-target'),
     }
   },
 
   { time:15, label:'Manny calls hallway point',
     annotation:{who:'MANNY',color:OP_COLOR.Manny,text:'"Hallway right, Manny on point."'}, bang:false,
     ops:{
-      Chris: op({x:2.0,y:0.8},  55,'dominating',    null,55,'right-shoulder','on-target'),
-      Mags:  op({x:2.0,y:2.4}, 150,'dominating',    null,55,'left-shoulder', 'on-target'),
+      Chris: op({x:1.5,y:1.5},  45,'dominating',    null,55,'right-shoulder','on-target'),
+      Mags:  op({x:1.2,y:3.8}, 315,'dominating',    null,55,'left-shoulder', 'on-target'),
       Manny: op({x:4.5,y:5.3},  90,'moving',        null,40,'none','on-target'),
     }
   },
