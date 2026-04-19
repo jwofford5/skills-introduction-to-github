@@ -38,7 +38,13 @@ const DOORS = [
   {id:'bathroom', hx:7,   hy:10,  len:1,   closedDeg:270, cw:false, state:'closed', roomBeyond:'bathroom', normal:90,  clearAt:38},
 ];
 
-// ── Keyframes — 3 operators: Chris (#1 point), Mags (#2 hook), Manny (#3 rear/hallway point)
+function op(pos, facing, posture, sw, widthDeg, wc, wr) {
+  return { pos, facing, posture,
+    sectorPrimary:{centerDeg:facing, widthDeg:widthDeg||60},
+    wallContact:wc||'none', weaponReady:wr||'on-target' };
+}
+
+// ── Keyframes — 3 operators: Chris (#1 point), Mags (#2 hook), Manny (#3 hallway point)
 const KEYFRAMES = [
   { time:0, label:'Stack forms on exterior wall', annotation:null, bang:false,
     ops:{
