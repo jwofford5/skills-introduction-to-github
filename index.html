@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>SWAT Tactical Simulator</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="app">
+  <div id="top-bar">
+    <span id="top-label">SWAT MOVEMENT</span>
+    <span id="step-label">Stack forms on wall</span>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="sim" width="700" height="520"></canvas>
+    <div id="annotation-overlay"></div>
+    <div id="bang-flash"></div>
+  </div>
+  <div id="controls">
+    <div id="transport">
+      <button id="btn-prev-kf" title="Previous keyframe">⏮</button>
+      <button id="btn-play" title="Play/Pause">▶</button>
+      <button id="btn-next-kf" title="Next keyframe">⏭</button>
+    </div>
+    <div id="speed-wrap">
+      <button class="spd" data-spd="0.5">0.5×</button>
+      <button class="spd active" data-spd="1">1×</button>
+      <button class="spd" data-spd="2">2×</button>
+    </div>
+    <div id="scrubber-wrap">
+      <input id="scrubber" type="range" min="0" max="1000" value="0"/>
+      <span id="time-display">0:00 / 0:42</span>
+    </div>
+  </div>
+  <div id="legend">
+    <span class="leg-item"><span class="leg-swatch" style="background:#ef4444"></span>FATAL FUNNEL</span>
+    <span class="leg-item"><span class="leg-swatch" style="background:#3b82f6"></span>SECTOR</span>
+    <span class="leg-item leg-note">SWIPE or use ⏮⏭ to step keyframes</span>
+  </div>
+</div>
+<script src="scenario.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>
