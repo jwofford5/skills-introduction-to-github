@@ -1,3 +1,5 @@
+import subprocess
+import os
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -15,6 +17,7 @@ for section in doc.sections:
     section.bottom_margin = Inches(0.85)
     section.left_margin = Inches(1.1)
     section.right_margin = Inches(1.1)
+    section.different_first_page_header_footer = True  # no header on page 1
 
 style = doc.styles['Normal']
 style.font.name = 'Times New Roman'
@@ -46,8 +49,7 @@ def add_colored_rule(doc, color_hex='1F3864', thickness='12'):
     return p
 
 
-def add_name_block(doc, name, contact_line1, contact_line2=None):
-    # Thin navy rule at very top
+def add_name_block(doc, name, email, phone, location):
     add_colored_rule(doc, thickness='18')
 
     p = doc.add_paragraph()
@@ -57,20 +59,14 @@ def add_name_block(doc, name, contact_line1, contact_line2=None):
     r = p.add_run(name)
     set_font(r, size=20, bold=True, color=NAVY)
 
+    # Contact line with clickable email
     p2 = doc.add_paragraph()
     p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p2.paragraph_format.space_before = Pt(0)
-    p2.paragraph_format.space_after = Pt(2)
-    r2 = p2.add_run(contact_line1)
-    set_font(r2, size=10, color=DARK_GRAY)
-
-    if contact_line2:
-        p3 = doc.add_paragraph()
-        p3.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p3.paragraph_format.space_before = Pt(0)
-        p3.paragraph_format.space_after = Pt(8)
-        r3 = p3.add_run(contact_line2)
-        set_font(r3, size=10, color=DARK_GRAY)
+    p2.paragraph_format.space_after = Pt(8)
+    add_hyperlink(p2, email, f'mailto:{email}')
+    sep = p2.add_run('  •  ' + phone + '  •  ' + location)
+    set_font(sep, size=10, color=DARK_GRAY)
 
     add_colored_rule(doc, thickness='18')
 
@@ -157,11 +153,99 @@ def add_label(doc, text):
     return p
 
 
+def add_hyperlink(paragraph, text, url):
+    """Add a clickable hyperlink run to an existing paragraph."""
+    part = paragraph.part
+    r_id = part.relate_to(url, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink', is_external=True)
+    hyperlink = OxmlElement('w:hyperlink')
+    hyperlink.set(qn('r:id'), r_id)
+    new_run = OxmlElement('w:r')
+    rPr = OxmlElement('w:rPr')
+    rStyle = OxmlElement('w:rStyle')
+    rStyle.set(qn('w:val'), 'Hyperlink')
+    rPr.append(rStyle)
+    new_run.append(rPr)
+    new_run.text = text
+    hyperlink.append(new_run)
+    paragraph._p.append(hyperlink)
+    # Style the run directly since 'Hyperlink' style may not exist
+    run = paragraph.add_run('')
+    for child in hyperlink:
+        if child.tag.endswith('}r'):
+            r_elem = child
+            rPr2 = r_elem.get_or_add_rPr() if hasattr(r_elem, 'get_or_add_rPr') else OxmlElement('w:rPr')
+            color_elem = OxmlElement('w:color')
+            color_elem.set(qn('w:val'), '1F3864')
+            rPr2.append(color_elem)
+            u_elem = OxmlElement('w:u')
+            u_elem.set(qn('w:val'), 'single')
+            rPr2.append(u_elem)
+    return hyperlink
+
+
+def add_running_header(doc, name):
+    """Add name + page number to the non-first-page header."""
+    for section in doc.sections:
+        header = section.header
+        header.is_linked_to_previous = False
+        p = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        p.clear()
+        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(4)
+
+        name_run = p.add_run(name + '  |  ')
+        set_font(name_run, size=9, color=DARK_GRAY, italic=True)
+
+        # Page number field
+        fldChar1 = OxmlElement('w:fldChar')
+        fldChar1.set(qn('w:fldCharType'), 'begin')
+        instrText = OxmlElement('w:instrText')
+        instrText.text = 'PAGE'
+        fldChar2 = OxmlElement('w:fldChar')
+        fldChar2.set(qn('w:fldCharType'), 'end')
+        page_run = OxmlElement('w:r')
+        rPr = OxmlElement('w:rPr')
+        page_run.append(rPr)
+        page_run.append(fldChar1)
+        page_run.append(instrText)
+        page_run.append(fldChar2)
+        p._p.append(page_run)
+
+        # Style the page number
+        num_run = p.add_run()
+        set_font(num_run, size=9, color=DARK_GRAY)
+
+
+def export_pdf(docx_path):
+    """Convert .docx to .pdf using LibreOffice headless. Skips gracefully if unavailable."""
+    output_dir = os.path.dirname(os.path.abspath(docx_path))
+    try:
+        result = subprocess.run([
+            'libreoffice', '--headless', '--convert-to', 'pdf',
+            '--outdir', output_dir, docx_path
+        ], capture_output=True, timeout=30)
+        pdf_name = os.path.splitext(os.path.basename(docx_path))[0] + '.pdf'
+        pdf_path = os.path.join(output_dir, pdf_name)
+        if os.path.exists(pdf_path):
+            return pdf_path
+        print('Note: PDF export unavailable in this environment.')
+        print('To create a PDF: open the .docx in Word → File → Save As → PDF,')
+        print('or upload to Google Docs → File → Download → PDF Document.')
+        return None
+    except Exception as e:
+        print(f'Note: PDF export skipped ({e}).')
+        print('To create a PDF: open the .docx in Word → File → Save As → PDF.')
+        return None
+
+
 # ── NAME & CONTACT ───────────────────────────────────────────────
 add_name_block(
     doc,
     'Chester Lee McMillion',
-    'lj.mcmillion@icloud.com  •  714.642.1313  •  Los Angeles, California'
+    email='lj.mcmillion@icloud.com',
+    phone='714.642.1313',
+    location='Los Angeles, California'
 )
 
 # ── RESEARCH INTERESTS ───────────────────────────────────────────
@@ -333,6 +417,12 @@ add_bullet(doc, 'Certificate of Merit, Outstanding Master’s Graduate Student, 
 add_bullet(doc, 'Los Angeles Police Department Major Commendations (8)')
 add_bullet(doc, 'Los Angeles Police Department Minor Commendations (130+)')
 
-filename = 'resume_Chester_McMillion.docx'
-doc.save(filename)
-print(f'Saved: {filename}')
+add_running_header(doc, 'Chester Lee McMillion')
+
+docx_filename = 'resume_Chester_McMillion.docx'
+doc.save(docx_filename)
+print(f'Saved: {docx_filename}')
+
+pdf_path = export_pdf(docx_filename)
+if pdf_path:
+    print(f'Saved: {pdf_path}')
