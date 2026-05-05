@@ -199,10 +199,11 @@ The script must:
 3. Set appropriate fonts, sizes, margins, line spacing, and section header styles
 4. Add a running header with name and page number on pages 2+ for multi-page documents (use `section.different_first_page_header_footer = True` so page 1 has no header)
 5. Make the email address a clickable mailto: hyperlink using the python-docx relationship API
-6. Build the full resume from the approved content
-7. Save the file as `resume_FirstName_LastName.docx` in the current directory
-8. Attempt PDF export via LibreOffice headless (`libreoffice --headless --convert-to pdf`) but handle failure gracefully — LibreOffice may not be available in all environments
-9. Print a confirmation with the filename(s) when complete
+6. Set `paragraph_format.keep_with_next = True` on every section header and its horizontal rule line — this prevents Word from orphaning a header at the bottom of a page with content starting on the next
+7. Build the full resume from the approved content
+8. Save the file as `resume_FirstName_LastName.docx` in the current directory
+9. Attempt PDF export via LibreOffice headless (`libreoffice --headless --convert-to pdf`) but handle failure gracefully — LibreOffice may not be available in all environments
+10. Print a confirmation with the filename(s) when complete
 
 ### After the Document is Created
 
