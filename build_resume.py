@@ -75,9 +75,11 @@ def add_section_header(doc, text):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(14)
     p.paragraph_format.space_after = Pt(1)
+    p.paragraph_format.keep_with_next = True
     r = p.add_run(text.upper())
     set_font(r, size=10.5, bold=True, color=NAVY)
-    add_colored_rule(doc, thickness='6')
+    rule = add_colored_rule(doc, thickness='6')
+    rule.paragraph_format.keep_with_next = True
     return p
 
 
