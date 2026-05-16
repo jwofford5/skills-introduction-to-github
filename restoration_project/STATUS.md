@@ -13,7 +13,7 @@
 | 4 | doc-flow       | ✅ Complete | Added 11 section lead-out transitions; all original content preserved |
 | 5 | doc-prose      | ✅ Complete | Mode: FLAG-AND-CONFIRM; 4 changes applied, 1 rejected (M.A.R. retained as intentional) |
 | 6 | doc-visuals    | ✅ Complete | 1 caption improved, 1 alt-text added, 2 callout boxes documented, 10 highlight flags cataloged for doc-format |
-| 7 | doc-format     | ACTIVE — ⏳ Pending | Government style; resolve highlights; preserve red scheme |
+| 7 | doc-format     | ✅ Complete | Government style applied; 10 highlights resolved; 14 layout annotations added |
 | 8 | doc-polish     | ACTIVE — ⏳ Pending | Acronyms, version number, Key Definitions |
 | 9 | doc-audit      | ⏳ Pending | |
 | 10 | doc-assemble  | ⏳ Pending | |
