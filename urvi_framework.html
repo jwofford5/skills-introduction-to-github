@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URVI Framework — Unified Response to Violent Incidents</title>
+  <style>
+    :root {
+      --red:    #7b0a0a;
+      --red-lt: #a01212;
+      --red-bg: #f9f0f0;
+      --gray:   #3a3a3a;
+      --light:  #f5f5f5;
+      --border: #ddd;
+      --hot:    #c0392b;
+      --warm:   #d4870a;
+      --cold:   #1a6b9a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--gray);
+      background: #fff;
+      line-height: 1.65;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      padding: 3rem 2rem 2.5rem;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+    header .acronym {
+      font-size: 1.1rem;
+      font-style: italic;
+      opacity: .85;
+      margin-bottom: .6rem;
+    }
+    header .subtitle {
+      font-size: .95rem;
+      opacity: .75;
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* ── NAV TOC ── */
+    nav {
+      background: var(--light);
+      border-left: 4px solid var(--red);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    nav h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .7rem; color: var(--red); }
+    nav ol { padding-left: 1.4rem; }
+    nav li { margin: .25rem 0; }
+    nav a { color: var(--red); text-decoration: none; font-family: sans-serif; font-size: .9rem; }
+    nav a:hover { text-decoration: underline; }
+
+    /* ── SECTIONS ── */
+    section { margin-bottom: 2.8rem; }
+    section:target { scroll-margin-top: 1rem; }
+
+    h2.section-title {
+      font-family: Arial, sans-serif;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--red);
+      border-bottom: 2px solid var(--red);
+      padding-bottom: .35rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    h2.section-title .icon { font-size: 1rem; }
+
+    h3 {
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      color: var(--red-lt);
+      border-left: 3px solid var(--red-lt);
+      padding-left: .6rem;
+      margin: 1.3rem 0 .5rem;
+    }
+
+    p { margin-bottom: .85rem; }
+
+    ul, ol { padding-left: 1.4rem; margin-bottom: .85rem; }
+    li { margin: .3rem 0; }
+
+    /* ── CALLOUT BOXES ── */
+    .callout {
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+    }
+    .callout-red   { background: var(--red-bg); border-left: 4px solid var(--red); }
+    .callout-gray  { background: var(--light);  border-left: 4px solid #888; }
+    .callout strong { display: block; margin-bottom: .3rem; }
+
+    /* ── PHASE TABLE ── */
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .phase-card {
+      border-radius: 4px;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--border);
+    }
+    .phase-card h4 {
+      font-family: Arial, sans-serif;
+      font-size: .9rem;
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+    .phase1 { background: #fff5f5; border-top: 4px solid var(--hot); }
+    .phase1 h4 { color: var(--hot); }
+    .phase2 { background: #fff8ec; border-top: 4px solid var(--warm); }
+    .phase2 h4 { color: var(--warm); }
+    .phase3 { background: #eef6fb; border-top: 4px solid var(--cold); }
+    .phase3 h4 { color: var(--cold); }
+
+    /* ── ZONE TABLE ── */
+    .zone-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-family: sans-serif; font-size: .88rem; }
+    .zone-table th { background: var(--red); color: #fff; padding: .5rem .8rem; text-align: left; }
+    .zone-table td { padding: .45rem .8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .zone-table tr:nth-child(even) td { background: var(--light); }
+    .z-hot { font-weight: 700; color: var(--hot); }
+    .z-warm { font-weight: 700; color: var(--warm); }
+    .z-cold { font-weight: 700; color: var(--cold); }
+
+    /* ── ORG CHART ── */
+    .org {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      margin: 1.2rem 0;
+      font-family: sans-serif;
+      font-size: .85rem;
+    }
+    .org-box {
+      background: var(--red);
+      color: #fff;
+      padding: .4rem 1.2rem;
+      border-radius: 3px;
+      text-align: center;
+      min-width: 160px;
+    }
+    .org-box.mid { background: var(--red-lt); }
+    .org-row { display: flex; gap: 1rem; }
+    .org-line {
+      width: 2px;
+      height: 18px;
+      background: var(--red);
+      margin: 0 auto;
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      margin: .35rem 0;
+      font-family: sans-serif;
+      font-size: .9rem;
+    }
+    .checklist li::before {
+      content: "☐";
+      flex-shrink: 0;
+      color: var(--red);
+      font-size: 1rem;
+      margin-top: .05rem;
+    }
+
+    /* ── DEFINITIONS ── */
+    .def-list dt {
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--red);
+      margin-top: .9rem;
+    }
+    .def-list dd {
+      margin-left: 1rem;
+      font-size: .92rem;
+      margin-top: .15rem;
+    }
+
+    /* ── REFERENCES ── */
+    .ref-list {
+      font-family: sans-serif;
+      font-size: .85rem;
+      padding-left: 1.2rem;
+    }
+    .ref-list li { margin: .4rem 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-family: sans-serif;
+      font-size: .8rem;
+      opacity: .9;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Unified Response to Violent Incidents</h1>
+  <div class="acronym">(URVI)</div>
+  <div class="subtitle">Framework for Los Angeles County · Operational Guidelines<br>Prepared by the URVI Guidelines Committee — Los Angeles County Public Safety Agencies</div>
+</header>
+
+<div class="container">
+
+  <!-- TOC -->
+  <nav>
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#exec">Executive Summary</a></li>
+      <li><a href="#doctrine">National Doctrine Foundation</a></li>
+      <li><a href="#incident-types">Incident Types: Dynamic vs. Static Scenarios</a></li>
+      <li><a href="#three-phase">Three-Phase Response Model</a></li>
+      <li><a href="#command">Command Procedures</a></li>
+      <li><a href="#unified">Unified Command</a></li>
+      <li><a href="#rtf">Rescue Task Forces (RTFs)</a></li>
+      <li><a href="#comms">Communications and Interoperability</a></li>
+      <li><a href="#training">Training and Preparedness</a></li>
+      <li><a href="#mutual-aid">Mutual Aid and Resource Management</a></li>
+      <li><a href="#quickref">Operational Quick-Reference</a></li>
+      <li><a href="#definitions">Key Definitions</a></li>
+      <li><a href="#references">References</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. EXECUTIVE SUMMARY -->
+  <section id="exec">
+    <h2 class="section-title"><span class="icon">⊕</span> Executive Summary</h2>
+
+    <p>The Unified Response to Violent Incidents (URVI) framework establishes a coordinated, multi-agency approach for Los Angeles County's response to active violence emergencies. URVI ensures that law enforcement, fire services, and emergency medical services (EMS) operate as a single cohesive force from the first moments of a crisis through recovery initiation.</p>
+
+    <p>This framework is a recommended guideline for all Los Angeles County public safety agencies. It does not supersede individual agency policies on use of force, tactical decisions, or specific departmental procedures. Instead, it provides the coordination architecture that enables agencies to work together effectively when violence strikes.</p>
+
+    <h3>Preamble</h3>
+    <p>The leader's intent of the URVI Framework is to support immediate, coordinated action during violent incidents. The framework is designed to help law enforcement, fire, and EMS resources operate from the earliest moments of a crisis with shared objectives: establish command, stop the threat, protect life, and begin lifesaving rescue operations as soon as conditions allow.</p>
+    <p>Responders should establish command immediately, including when operating in a mobile capacity, and transition to Unified Command as early as conditions and resources allow. Cross-discipline integration is essential, but engagement should not be paused due to lack of staffing on either side.</p>
+
+    <h3>Vision and Objectives</h3>
+    <p>URVI envisions every violent emergency in Los Angeles County met with a seamless, collaborative response. The framework establishes five core objectives:</p>
+    <ul>
+      <li><strong>Establish Command from the Outset:</strong> Transition to Unified Command as early as possible so all agencies share leadership and common objectives from the start.</li>
+      <li><strong>Rapid Threat Neutralization:</strong> Empower first responders to take immediate action to stop the threat, shortening the duration of violence.</li>
+      <li><strong>Swift Victim Care and Evacuation:</strong> Deploy integrated Rescue Task Forces (RTFs) quickly into cleared areas to treat and evacuate injured victims.</li>
+      <li><strong>Interoperable Communication:</strong> Use common terminology, interoperable radios, and coordinated tactics across all agencies.</li>
+      <li><strong>Continuous Joint Preparedness:</strong> Conduct regular multi-agency training and exercises to build interagency trust and operational readiness.</li>
+    </ul>
+
+    <h3>Target Audience</h3>
+    <p>This document is intended for the entire Los Angeles County public safety community: law enforcement officers, firefighters, paramedics, EMTs, incident commanders, field supervisors, and dispatch centers. Personnel involved in planning, leading, or participating in the response to violent incidents are part of the target audience.</p>
+
+    <h3>The Los Angeles County Operational Environment</h3>
+    <p>Los Angeles County's public safety landscape demands a tailored approach to unified response. The county spans a population of over 10 million people and includes dozens of separate police and fire agencies. This patchwork of jurisdictions means that any significant violent incident will likely draw responders from multiple organizations with distinct protocols, radio systems, and command structures.</p>
+    <p>Los Angeles also hosts large-scale events that involve unified planning among police, fire, EMS, and federal partners. The region's dense urban landscape, heavy traffic, and sprawling venues all shape how perimeters are established, how zones are managed, and how resources are repositioned.</p>
+
+    <h3>Alignment with National Doctrine</h3>
+    <p>URVI is grounded in FIRESCOPE 701, the National Incident Management System (NIMS), and the Incident Command System (ICS), ensuring all roles, terminology, and structures are nationally standardized. URVI operationalizes national doctrine for the specific realities of Los Angeles County.</p>
+
+    <h3>Scope of Covered Incidents</h3>
+    <p>The framework covers violent incident types requiring unified response, including active assailant attacks (shooters, mass stabbings, vehicle rammings), mass casualty terrorist attacks (bombings and coordinated attacks), civil unrest and riots involving violence, armed barricades, and hostage situations. Purely accidental events or natural disasters are outside the scope unless compounded by deliberate violent acts.</p>
+
+    <div class="callout callout-red">
+      <strong>Consequences of Breaking from Doctrine</strong>
+      Straying from ICS, NIMS, or Unified Command during a high-risk violent incident can have severe consequences. Without unified command, agencies may pursue conflicting objectives, critical information may be missed, and responders may be placed in unnecessary danger. Lack of accountability leads to freelancing, overlapping efforts, and areas of the incident left unchecked. A fractured command structure wastes precious time and ultimately translates to slower threat neutralization and delayed victim treatment. Adherence to doctrine is essential.
+    </div>
+  </section>
+
+  <!-- 2. DOCTRINE -->
+  <section id="doctrine">
+    <h2 class="section-title"><span class="icon">⊕</span> National Doctrine Foundation</h2>
+
+    <h3>Core NIMS Principles</h3>
+    <p>Several NIMS concepts are especially relevant for URVI response:</p>
+    <ul>
+      <li><strong>Common Terminology:</strong> All responders use plain language and shared definitions for key terms. No agency-specific codes during URVI events.</li>
+      <li><strong>Unified Command:</strong> When multiple agencies are involved, leaders form one team to set objectives and priorities together.</li>
+      <li><strong>Chain of Command and Unity of Command:</strong> Every responder knows exactly who they report to under the incident organization.</li>
+      <li><strong>Manageable Span of Control:</strong> No supervisor oversees more than five to seven individuals or teams, ensuring effective monitoring under high stress.</li>
+      <li><strong>Incident Action Planning:</strong> Even during rapidly evolving events, establishing incident objectives ensures all agencies operate toward common goals.</li>
+    </ul>
+
+    <h3>NFPA 3000 as a Guiding Standard</h3>
+    <p>NFPA 3000 provides validated strategies for active shooter and hostile event response. Key tenets incorporated into URVI include Unified Command as a non-negotiable practice, integrated Rescue Task Forces entering warm zones under law enforcement protection, common operational language and compatible radio channels, and regular joint training exercises. By following NFPA 3000 guidance, URVI ensures Los Angeles County's practices meet nationally recognized benchmarks.</p>
+  </section>
+
+  <!-- 3. INCIDENT TYPES -->
+  <section id="incident-types">
+    <h2 class="section-title"><span class="icon">⊕</span> Incident Types: Dynamic vs. Static Scenarios</h2>
+
+    <p>Not all violent incidents unfold the same way. URVI distinguishes between dynamic and static (or contained) scenarios because the operational tempo, phase transitions, RTF deployment, and tactical approach differ significantly between them.</p>
+
+    <h3>Dynamic Incidents</h3>
+    <p>A dynamic incident is one in which violence is actively occurring, or the threat is mobile and unpredictable. The defining characteristic is that the attacker is actively causing harm or has the immediate capacity to do so.</p>
+    <p>In dynamic incidents, the response tempo is at its highest. Phase 1 "Stop the Killing" dominates the early response. Law enforcement's priority is establishing Mobile Command with immediate engagement, with officers deploying toward the threat without delay. Mobile Command functions with the first officer on scene simultaneously fulfilling the incident command role while coordinating the rapid formation of Contact Teams to aggressively locate and neutralize the threat.</p>
+    <p>Phase 2 "Stop the Dying" hinges on RTF deployment. However, dynamic incidents carry a heightened risk of the situation reverting to Phase 1; for example, a contained shooter may break free. Key operational considerations for dynamic incidents include solo officer engagement, which may be necessary before backup arrives.</p>
+
+    <h3>Static or Contained Incidents</h3>
+    <p>A static or contained incident is one where the threat is present but not actively causing harm. The approach shifts from aggressive rapid deployment to containment, negotiation, and planned tactical intervention. While Phase 1 principles still apply, the operational tempo is more deliberate.</p>
+
+    <h3>Transitioning Between Types</h3>
+    <p>Incidents can shift between dynamic and static at any point. Incident commanders must continuously assess the nature of the threat and adjust the operational tempo accordingly. URVI's integrated command structure, common terminology, and pre-planned procedures ensure that these transitions can be managed smoothly without losing coordination between agencies.</p>
+  </section>
+
+  <!-- 4. THREE-PHASE -->
+  <section id="three-phase">
+    <h2 class="section-title"><span class="icon">⊕</span> Three-Phase Response Model</h2>
+
+    <p>The URVI guidelines organize the response to violent incidents into three distinct phases.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card phase1">
+        <h4>Phase 1 — Stop the Killing</h4>
+        <p>Law enforcement immediately engages to neutralize the threat. Speed and direct action are prioritized.</p>
+      </div>
+      <div class="phase-card phase2">
+        <h4>Phase 2 — Stop the Dying</h4>
+        <p>Integrated Rescue Task Forces deploy into warm zones to treat and evacuate injured victims.</p>
+      </div>
+      <div class="phase-card phase3">
+        <h4>Phase 3 — Recovery and Transition</h4>
+        <p>Scene secured, all critical victims addressed, shift to recovery and investigation.</p>
+      </div>
+    </div>
+
+    <p>Each phase has clear priorities and transitions based on conditions, not time. Phases may overlap, and responders must be prepared to revert to an earlier phase as the incident evolves.</p>
+
+    <h3>Phase 1 — Stop the Killing</h3>
+    <p>Phase 1 begins the moment a violent incident is recognized. The overriding mission is preventing further loss of life from the aggressor. Law enforcement officers immediately move to engage or contain the suspect.</p>
+    <p><strong>Law Enforcement Priorities:</strong></p>
+    <ul>
+      <li><strong>Establish Command and Rapidly Deploy to the Threat:</strong> Officers deploy immediately to confront the suspect. Speed and direct action are prioritized to make contact with the threat as quickly as possible.</li>
+      <li><strong>Neutralize and/or Isolate the Threat:</strong> Use necessary force to stop the threat or work to isolate and contain the suspect to deny access to additional victims.</li>
+      <li><strong>Protect Life:</strong> Direct able-bodied individuals to evacuate or shelter in place as law enforcement moves to engage the threat.</li>
+      <li><strong>Communicate Critical Information:</strong> Relay suspect description, location, weapons, number of assailants, and additional assignments to dispatch and incoming units.</li>
+      <li><strong>Establish Initial Perimeter:</strong> Contain the incident geographically to prevent suspect escape and channel individuals away from danger.</li>
+    </ul>
+
+    <p><strong>Solo Officer Engagement:</strong> The first officer on scene must act without delay if lives are at risk, even without backup. Solo officers establish Mobile Command and move toward the threat, broadcasting their location and actions to incoming units. Solo engagement is a stopgap until reinforcements arrive.</p>
+
+    <p><strong>Contact Team Deployment:</strong> As additional officers arrive, they organize into contact teams of two to four officers who move together in coordinated tactical formation. The team lead guides movement toward the active threat. Contact teams move dynamically, bypassing rooms to reach and neutralize the active threat quickly.</p>
+
+    <p><strong>Supervisor Responsibilities:</strong></p>
+    <ul>
+      <li>Establish Command and an Incident Command Post (ICP)</li>
+      <li>Request additional resources early: field personnel, Fire/EMS, mutual aid, and specialized units</li>
+      <li>Designate staging areas and perimeters</li>
+      <li>Integrate Fire/EMS as they arrive: physically meet the ranking fire officer and share situation updates</li>
+      <li>Maintain personnel accountability</li>
+    </ul>
+
+    <h3>Phase 2 — Stop the Dying</h3>
+    <p>With the threat neutralized or contained, Phase 2 focuses on rapid medical intervention. Integrated police-fire/EMS Rescue Task Forces deploy into warm zones to treat injured victims using the MARCH algorithm (Massive Hemorrhage, Airway, Respiration, Circulation, Hypothermia/Head Injury). This phase represents a fundamental shift from the old paradigm of holding EMS back until scenes were fully cleared.</p>
+
+    <p><strong>RTF Deployment Considerations:</strong></p>
+    <ul>
+      <li><strong>Established Warm Zone:</strong> Law enforcement has declared specific areas clear of active threats.</li>
+      <li><strong>Force Protection Available:</strong> Dedicated law enforcement officers are assigned to provide force protection for each RTF.</li>
+      <li><strong>RTF Team Equipped:</strong> Personnel identified, wearing ballistic protective equipment, carrying hemorrhage control and rapid patient movement gear.</li>
+      <li><strong>Communications Plan:</strong> Clear radio channels established for RTF teams.</li>
+      <li><strong>Secure Ingress/Egress Route:</strong> Law enforcement has identified and physically secured a path into and out of the warm zone.</li>
+    </ul>
+
+    <p><strong>Tactical Emergency Medical Priorities (MARCH):</strong></p>
+    <ul>
+      <li>Rapid Casualty Location and Assessment — direct walking wounded to self-evacuate to the cold zone</li>
+      <li>Life-Saving Interventions — apply tourniquets, wound packing, chest seals, airway management</li>
+      <li>Rapid Extraction to Casualty Collection Points — stabilize enough to move; the mantra is "treat and move"</li>
+      <li>Continuous Triage and Handoff — flag/tag patients by severity; provide brief handoff reports to receiving personnel at the casualty collection point</li>
+    </ul>
+
+    <h3>Phase 3 — Recovery and Transition</h3>
+    <p>Phase 3 begins when the immediate threat has been neutralized and all known critical victims have been addressed. The Incident Commander declares the shift from emergency response to recovery and scene management.</p>
+    <p><strong>Command Priorities in Phase 3:</strong></p>
+    <ul>
+      <li><strong>Ensure Scene Security and Integrity:</strong> Maintain perimeters for both security and evidence preservation.</li>
+      <li><strong>Care for the Injured and Affected:</strong> Confirm no additional victims remain untreated; establish survivor assembly and family reunification areas.</li>
+      <li><strong>Public Information Management:</strong> Activate a Joint Information Center; issue one unified message from all agencies.</li>
+      <li><strong>Assign Detectives:</strong> Ensure positive identification of every patient transported from the scene to hospitals.</li>
+      <li><strong>Resource Management and Relief:</strong> Rotate fresh personnel in; establish rehab areas; plan for shift coverage.</li>
+    </ul>
+  </section>
+
+  <!-- 5. COMMAND -->
+  <section id="command">
+    <h2 class="section-title"><span class="icon">⊕</span> Command Procedures</h2>
+
+    <h3>First Officer on Scene</h3>
+    <p>The first arriving responder has both the authority and responsibility to establish command, regardless of discipline or rank. Someone must start organizing the response immediately. Waiting for a higher-ranking officer could lead to dangerous delays.</p>
+    <p><strong>Responsibilities:</strong></p>
+    <ul>
+      <li>Establish and announce Mobile Command using a clear incident name (e.g., "Main Street Command"), engage the immediate threat if lives are at risk, and perform a rapid size-up: nature of incident, exact location, suspect information, immediate hazards, available cover, initial resource needs, and zone designations.</li>
+      <li>Communicate situational updates to dispatch and incoming responders using plain language.</li>
+      <li>Establish initial control measures: identify hot, warm, and cold zones; set inner perimeter; identify safe approach routes and staging areas.</li>
+      <li>Request additional resources.</li>
+      <li>Organize incoming units with specific task assignments.</li>
+      <li>Maintain command until formally relieved.</li>
+    </ul>
+
+    <p><strong>Initial Radio Communication:</strong> The first radio broadcast should accomplish multiple tasks: identify the officer on scene, describe the incident, give the command name, and give initial directions. Example: <em>"Lincoln 3 on scene — active shooter at the school, multiple victims in the lobby. I am establishing Central School Command. Suspect last seen heading north hallway. Need additional units for perimeter north side. Fire and EMS stage at Maple and 1st."</em></p>
+
+    <h3>Mobile Command</h3>
+    <p>Mobile Command is the practice of the first arriving officer serving as incident commander while still directly engaged in the unfolding incident. ICS and NIMS demand that command be established immediately — they do not require the first Incident Commander to be at a stationary command post. Mobile Command bridges the gap between incident onset and the establishment of a formal command structure.</p>
+
+    <h3>Role of Second Supervisor</h3>
+    <p>When a second supervisor arrives, they should typically assume the Incident Commander role, freeing the first supervisor or officer to focus on tactical operations. The second supervisor's arrival creates a critical division of labor: one leader manages the tactical fight, the other coordinates the overall incident organization.</p>
+
+    <h3>Transfer of Command</h3>
+    <p>Command transfers follow a structured protocol to maintain continuity:</p>
+    <ul>
+      <li>The incoming commander reports to the current IC and receives a situation briefing covering incident status, actions taken, resources deployed, safety concerns, and the communications plan.</li>
+      <li>The incoming commander explicitly accepts command.</li>
+      <li>A clear radio announcement informs all field personnel of the change.</li>
+      <li>The outgoing commander transitions to a subordinate role, preserving their situational knowledge within the operation.</li>
+      <li>When command transfers, the new commander should identify themselves by position or call sign so all units know who is directing the incident.</li>
+    </ul>
+
+    <h3>Transition from Mobile to Fixed Command Post</h3>
+    <p>When conditions allow — threat level reduced, multi-agency personnel present, sufficient command staff available — command transitions to a fixed location in the cold zone. The fixed command post should have strong radio reception, adequate space for unified leadership, and be clearly identified for incoming units.</p>
+  </section>
+
+  <!-- 6. UNIFIED COMMAND -->
+  <section id="unified">
+    <h2 class="section-title"><span class="icon">⊕</span> Unified Command</h2>
+
+    <p>Unified Command is the cornerstone of URVI. It ensures that law enforcement, fire, EMS, and other relevant agencies jointly manage the overall incident under one coherent plan. No single agency can handle all aspects of a major violent incident alone. Unified Command prevents confusion and delays, ensures threat containment and stabilization, provides medical care, and improves responder safety through coordinated action.</p>
+
+    <p>Unified Command should be established the moment two or more agencies are actively engaged.</p>
+
+    <h3>Unified Command Responsibilities</h3>
+    <ul>
+      <li>Establish overall objectives and priorities — law enforcement should lead but must integrate medical resources seamlessly.</li>
+      <li>Develop and implement a shared Incident Action Plan.</li>
+      <li>Assign roles and tasks across agencies, leveraging each discipline's expertise.</li>
+      <li>Manage resources and maintain situational awareness by gathering input from all disciplines.</li>
+      <li>Ensure responder safety: evaluate zones, designate zones, mandate protective equipment.</li>
+      <li>Coordinate phase transitions and handoffs to investigative or recovery authorities.</li>
+      <li>Face-to-face coordination among unified commanders for critical decisions.</li>
+    </ul>
+
+    <h3>Command Post Setup</h3>
+    <p>The Unified Command Post should be in the cold zone, clearly identified, accessible to all agencies, and equipped with reliable communications. Co-location is the guiding principle: what matters most is that all key leaders are physically together, making joint decisions.</p>
+
+    <h3>Communication Protocols</h3>
+    <ul>
+      <li>A designated command radio channel monitored by all agencies' leadership.</li>
+      <li>Integrated dispatch communication linking police, fire, and EMS dispatch centers.</li>
+      <li>Plain language at all times — no agency-specific codes or jargon.</li>
+      <li>Regular unified briefings to maintain alignment.</li>
+      <li>One unified voice to the field: messages are agreed upon and not contradictory.</li>
+    </ul>
+
+    <h3>Preventing Conflict in Multi-Agency Command</h3>
+    <p>Conflict is prevented through the establishment of unified objectives, clear division of labor under one plan, strong communication discipline, and a cooperative leadership ethos. Pre-incident planning, joint training exercises, and established mutual aid agreements remove much of the ambiguity that breeds conflict during operations.</p>
+
+    <!-- Org Chart -->
+    <h3>Example Basic URVI Organization</h3>
+    <div class="org">
+      <div class="org-box">Unified Command<br><small>Law Enforcement / Fire / EMS</small></div>
+      <div class="org-line"></div>
+      <div class="org-row">
+        <div>
+          <div class="org-box mid">Contact Group<br><small>Supervisor</small></div>
+          <div class="org-line"></div>
+          <div class="org-row">
+            <div class="org-box mid" style="font-size:.8rem">Contact<br>Team 1</div>
+            <div class="org-box mid" style="font-size:.8rem">Contact<br>Team 2</div>
+          </div>
+        </div>
+        <div>
+          <div class="org-box mid">Rescue Group<br><small>Supervisor</small></div>
+          <div class="org-line"></div>
+          <div class="org-row">
+            <div class="org-box mid" style="font-size:.8rem">RTF 1</div>
+            <div class="org-box mid" style="font-size:.8rem">RTF 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:.82rem; font-style: italic; text-align:center;">This example illustrates a basic organizational structure for coordinating threat engagement and victim rescue during a violent incident. The structure may expand or contract based on incident conditions, available resources, agency policy, and Unified Command direction.</p>
+  </section>
+
+  <!-- 7. RTF -->
+  <section id="rtf">
+    <h2 class="section-title"><span class="icon">⊕</span> Rescue Task Forces (RTFs)</h2>
+
+    <h3>Definition and Composition</h3>
+    <p>A Rescue Task Force is a unified team of fire/EMS personnel and law enforcement officers formed to rapidly treat and extract victims in the warm zone. Standard composition pairs two to four firefighter/EMS members with at least two law enforcement officers providing force protection. Each RTF operates as a single cohesive unit with a unique designator (e.g., "RTF-1") and a single team leader.</p>
+    <p>The medical members carry modified medical kits focused on hemorrhage control and airway management — lightweight and agile for rapid movement. Law enforcement officers serve as the protective overwatch, leading movement, securing corridors and doorways, maintaining 360-degree force protection around medics, and controlling the team's tempo.</p>
+
+    <h3>RTF Formation</h3>
+    <p>RTFs are assembled in real time as units arrive on scene, under Unified Command direction. Once warm zones are identified and sufficient force protection available, command pairs law enforcement officers with fire/EMS crews. Each RTF should ideally receive a clear assignment, insertion point, and communication channel. Pre-planned interoperability — common training, compatible radios, and interagency trust — is essential for rapid assembly.</p>
+
+    <h3>Roles Within the RTF</h3>
+    <p><strong>Law Enforcement Personnel:</strong> Serve as the protective overwatch. They lead movement, secure corridors and doorways, maintain 360-degree force protection around medics, and control the team's tempo. Officers do not pursue the suspect independently; their sole mission is RTF team safety.</p>
+    <p><strong>Fire/EMS Personnel:</strong> Focus on medical operations: rapid casualty location and assessment, life-saving interventions (following the MARCH algorithm), triage decisions, and patient evacuation. They operate under the tactical parameters set by law enforcement; if officers say a location is not secure, medics adapt accordingly.</p>
+
+    <h3>Deployment Triggers and Priorities</h3>
+    <p>RTF deployment requires a designated warm zone, sufficient force protection, appropriately equipped RTF teams (URVI PPE: ballistic helmet, Level 3 ballistic vest with plate, and no turnout gear). If resources are limited, command deploys to where immediate intervention will save the most lives and assigns subsequent teams as they become available.</p>
+
+    <h3>Operational Zone Definitions</h3>
+    <table class="zone-table">
+      <tr>
+        <th>Zone</th>
+        <th>Definition</th>
+        <th>Who Operates Here</th>
+      </tr>
+      <tr>
+        <td><span class="z-hot">Hot Zone</span></td>
+        <td>Area of active or highly suspected threat. Only law enforcement operates here.</td>
+        <td>Law Enforcement only. Fire/EMS do not enter under any circumstances.</td>
+      </tr>
+      <tr>
+        <td><span class="z-warm">Warm Zone</span></td>
+        <td>Areas cleared by law enforcement but not fully secured.</td>
+        <td>RTFs operate with law enforcement force protection. All personnel wear ballistic protection. If security changes, the zone instantly becomes hot.</td>
+      </tr>
+      <tr>
+        <td><span class="z-cold">Cold Zone</span></td>
+        <td>Safe area with no significant risk.</td>
+        <td>Command posts, staging areas, medical treatment, and transport areas are located here.</td>
+      </tr>
+    </table>
+    <p>Strict zone discipline is fundamental to safe Phase 2 operations. Personnel must stay in their assigned zones at all times. If unsure whether an area is hot or warm, treat it as hot until confirmed otherwise.</p>
+
+    <h3>RTF-to-Command Communication</h3>
+    <ul>
+      <li>Each RTF uses a designated call sign (e.g., RTF 1, RTF 2, etc.) and communicates with command on the specified channel.</li>
+      <li>Regular status reports: area cleared, patient count, supply needs, team status.</li>
+      <li>Emergency calls use plain language for immediate threat situations.</li>
+      <li>Medical information relay: number and severity of patients, resource needs.</li>
+      <li>All orders from command are acknowledged by RTF leaders.</li>
+    </ul>
+
+    <h3>Withdrawal Criteria</h3>
+    <p>RTFs withdraw when conditions deteriorate beyond acceptable risk:</p>
+    <ul>
+      <li>The warm zone becomes hot (active threat re-emerges in the RTF's area).</li>
+      <li>Loss of communications with command or law enforcement overwatch.</li>
+      <li>Team member requiring immediate evacuation.</li>
+      <li>Explicit command order. All RTF members are trained to react immediately to withdrawal orders.</li>
+    </ul>
+
+    <h3>Multiple RTF Oversight</h3>
+    <p>For large incidents with multiple RTFs, a Rescue Group Supervisor is assigned to maintain accountability for all RTFs, with ongoing tactical operations. Command deconflicts RTF operations to ensure rescue and tactical efforts complement rather than endanger each other.</p>
+  </section>
+
+  <!-- 8. COMMS -->
+  <section id="comms">
+    <h2 class="section-title"><span class="icon">⊕</span> Communications and Interoperability</h2>
+
+    <h3>Communications Principles</h3>
+    <p>Effective communication is the foundation of unified response and requires plain language at all times during violent incident operations — no ten-codes, no agency-specific jargon. All responders must understand every message transmitted. Common terminology for zones (hot, warm, cold), teams (contact team, RTF), and roles (Incident Commander, Operations, Contact Group Supervisor, Rescue Group Supervisor) is standardized across disciplines.</p>
+
+    <h3>Radio Channel Architecture</h3>
+    <p>Unified Command establishes a communications plan as one of its first actions. This typically includes a command channel for leadership coordination and a tactical channel for field operations. If interoperable frequencies are not available, supervisory personnel may share portable radios to bridge the communication gap.</p>
+
+    <h3>Not All Agencies Can Communicate Directly</h3>
+    <p>The framework acknowledges that not all law enforcement agencies can communicate directly with fire departments due to incompatible radio systems. Planning should account for this limitation through pre-designated interoperable channels, relay procedures, face-to-face communication at co-located command posts, and liaison officers who bridge the communications gap.</p>
+
+    <h3>Information Flow During Operations</h3>
+    <p>Critical information must flow in both directions between field teams and Unified Command. Field teams report: threat status, victim locations and counts, areas cleared, hazards encountered, and resource needs. Command pushes: zone status updates, tactical operation warnings, phase transitions, and resource deployments.</p>
+    <p>Information flow should be continuous but disciplined — every transmission should be short, necessary, and actionable. Over-communication of important safety information is preferred over assumptions.</p>
+
+    <h3>Subsequent Control Measures</h3>
+    <p>As the incident evolves, command must communicate updated control measures to all units. This includes changes to zone boundaries (e.g., "Floor 1 is now cold, Floor 2 warm, Floor 3 hot"), updated staging locations, modified ingress/egress routes, and shifts in tactical focus. Each update is broadcast clearly and acknowledged by affected units.</p>
+  </section>
+
+  <!-- 9. TRAINING -->
+  <section id="training">
+    <h2 class="section-title"><span class="icon">⊕</span> Training and Preparedness</h2>
+
+    <h3>Joint Training Imperative</h3>
+    <p>Successful unified response is largely the product of groundwork laid before an incident. Agencies must invest in regular multi-agency training and exercises. Tabletop exercises allow commanders to practice unified decision-making. Full-scale drills simulate real incidents with mock Unified Command posts, RTF deployments, and communication under stress. These exercises build personal relationships and trust across agencies, surface radio incompatibilities or terminology confusion, and create organizational muscle memory.</p>
+
+    <h3>Training for Phase 2 Operations</h3>
+    <p>Phase 2 operations — RTF deployment, warm zone medical care, and integrated police-fire tactical movement — require dedicated training emphasis. Fire/EMS personnel must be proficient in Tactical Emergency Casualty Care (TECC), comfortable operating in ballistic protective equipment, and practiced in the law enforcement protection model. Law enforcement must be trained in force protection tactics, close coordination with non-law enforcement personnel, and basic hemorrhage control. Joint RTF drills are essential for building the cross-discipline coordination that saves lives.</p>
+
+    <h3>First-On-Scene Leadership Training</h3>
+    <p>Patrol officers and junior supervisors must be placed into simulated critical incidents where they practice rapid size-up, command declaration, initial unit assignments, and command transfer. Agencies should provide job aids and checklists, reinforce plain language radio communication, and create a culture where taking initiative is expected and supported.</p>
+
+    <h3>Pre-Incident Planning</h3>
+    <p>Agencies should jointly develop protocols for Unified Command formation, including pre-designated command post locations, interoperable radio channels, and information-sharing procedures. Pre-incident planning also includes maintaining contact directories, agreeing on mutual aid triggers, and identifying liaison officers for interdisciplinary deployment.</p>
+
+    <h3>Empowerment and Support</h3>
+    <p>Training must be paired with organizational empowerment. Agency leadership should clearly communicate that on-scene command decisions are expected and supported. Officers who take command and make reasonable decisions under extreme stress should not face unfair second-guessing. Post-incident reviews should specifically examine whether first responders established command and organized the response — and if not, identify training gaps.</p>
+
+    <h3>Sample Size-Up Components</h3>
+    <p>Agencies should train first responders to rapidly assess and communicate the following during initial size-up:</p>
+    <ul>
+      <li>Nature of incident (active shooter, hostage situation, bombing, etc.) and current dynamics.</li>
+      <li>Exact location and scale of affected area.</li>
+      <li>Suspect information: number, description, weapons, last known location and direction of movement.</li>
+      <li>Victim and hazard estimates.</li>
+      <li>Available cover, terrain, and exit points.</li>
+      <li>Initial resource needs and requested assets.</li>
+      <li>Preliminary zone designations and perimeter recommendations.</li>
+    </ul>
+  </section>
+
+  <!-- 10. MUTUAL AID -->
+  <section id="mutual-aid">
+    <h2 class="section-title"><span class="icon">⊕</span> Mutual Aid and Resource Management</h2>
+
+    <h3>Managing Incoming Resources</h3>
+    <p>In the early phase of a critical incident, resources often arrive rapidly from across the county. The Incident Commander must manage this influx to prevent chaos — the first priority is establishing a staging area in the cold zone, away from where incoming resources converge at the scene. Effective mutual aid resource management means preventing overcommitment, traffic gridlock, or dilution of effort. The IC will assign units to specific tactical tasks: forming additional contact teams, securing additional perimeter positions, staging for RTF deployment, or preparing for Phase 3 operations.</p>
+
+    <h3>Mutual Aid Integration</h3>
+    <p>Los Angeles County's multi-jurisdictional landscape means that significant violent incidents will draw resources from multiple agencies. Mutual aid units arriving from other jurisdictions should be seamlessly integrated into the incident command system structure. They report to staging, receive a briefing upon arrival covering incident status, current command structure, tactical channel in use, and their specific assignment. The goal is to get them to on-scene quickly without disrupting the existing organization.</p>
+    <p>Mutual aid personnel should be familiar with ICS/NIMS principles and operate under the unified plan. Pre-established mutual aid agreements and common training in ICS/NIMS principles make this integration possible.</p>
+
+    <h3>Resource Tracking</h3>
+    <p>Unified Command maintains accountability of all resources through continuous tracking — knowing which units are deployed and where, which are in staging awaiting assignment, and which have been released. Resource tracking ensures that command can rapidly reassign or recall units if conditions change.</p>
+
+    <h3>Preventing Freelancing/Self-Deployment and Overlap</h3>
+    <p>A persistent challenge in large incidents is preventing individual responders or units from taking independent actions outside the incident command structure. The framework addresses this through clear command structure, mandatory check-in at staging, specific task assignments for all arriving units, and a culture of discipline reinforced through training. Every responder operates under the incident organization, following the direction of their assigned supervisor.</p>
+  </section>
+
+  <!-- 11. QUICK REF -->
+  <section id="quickref">
+    <h2 class="section-title"><span class="icon">⊕</span> Operational Quick-Reference</h2>
+
+    <h3>First Officer on Scene Checklist</h3>
+    <ul class="checklist">
+      <li>Announce arrival and establish command: "[Unit] on scene, establishing [Location] Command."</li>
+      <li>Identify and broadcast: incident type, suspect description, weapons, location, direction of movement.</li>
+      <li>If active threat: move toward threat to engage or contain. If threat contained: begin organizing.</li>
+      <li>Designate hot/warm/cold zones (even if preliminary).</li>
+      <li>Request additional resources.</li>
+      <li>Identify staging area for incoming units.</li>
+      <li>Assign arriving units to specific tasks: contact teams, perimeter, staging.</li>
+      <li>Maintain command until formally relieved by a higher authority.</li>
+    </ul>
+
+    <h3>Supervisor Arrival Checklist</h3>
+    <ul class="checklist">
+      <li>Announce assumption of command or confirm existing IC.</li>
+      <li>Receive briefing from initial IC: threat status, resources deployed, victims, hazards.</li>
+      <li>Establish or confirm fixed command post location in cold zone.</li>
+      <li>Verify perimeter positions and staging area.</li>
+      <li>Contact fire/EMS commander to establish Unified Command.</li>
+      <li>Ensure communications plan is in place (shared channels, plain language).</li>
+      <li>Begin tracking resources and assignments.</li>
+      <li>Plan for Phase 2 transition: RTF readiness, warm zone identification.</li>
+    </ul>
+
+    <h3>Unified Command Formation Checklist</h3>
+    <ul class="checklist">
+      <li>Law enforcement and fire/EMS commanders physically co-located.</li>
+      <li>Joint situation briefing completed (eliminate threat, secure and stabilize, provide medical care).</li>
+      <li>Common Incident Action Plan (even verbal) agreed upon.</li>
+      <li>Incident Action Plan formalized (even verbal).</li>
+      <li>Communications plan established: command channel, tactical channel, RTF channel.</li>
+      <li>Roles assigned: Operations, Contact Group, Rescue Group, Medical Group, Staging, Safety.</li>
+      <li>Radio announcement: "Unified Command established at [location] with [agencies]."</li>
+    </ul>
+
+    <h3>RTF Deployment Checklist</h3>
+    <ul class="checklist">
+      <li>Warm zone confirmed by law enforcement.</li>
+      <li>RTF teams (FD and LE force protection officers) briefed and assigned.</li>
+      <li>Fire/EMS members equipped: ballistic vest, helmet, trauma kit.</li>
+      <li>Communications tested: radio check with command.</li>
+      <li>Once identified, the insertion point and route are briefed to all team members.</li>
+      <li>Extraction route identified.</li>
+      <li>RTF designator assigned (e.g., RTF-1).</li>
+      <li>Team moves as a single unit — no separation.</li>
+    </ul>
+
+    <h3>Phase Transition Decision Points</h3>
+    <div class="callout callout-gray">
+      <strong>PHASE 1 → PHASE 2:</strong>
+      <ul>
+        <li>Suspect neutralized, contained, or isolated from potential victims.</li>
+        <li>At least partial warm zone established.</li>
+        <li>RTFs formed and ready.</li>
+      </ul>
+    </div>
+    <div class="callout callout-gray">
+      <strong>PHASE 2 → PHASE 3:</strong>
+      <ul>
+        <li>All known critical victims evacuated.</li>
+        <li>No active threats confirmed.</li>
+        <li>Some security established for recovery operations.</li>
+        <li>Investigative and recovery personnel arriving.</li>
+      </ul>
+    </div>
+    <div class="callout callout-gray" style="margin-top:.5rem">
+      <strong>Unified Command concurrence achieved before any phase transition.</strong>
+    </div>
+  </section>
+
+  <!-- 12. DEFINITIONS -->
+  <section id="definitions">
+    <h2 class="section-title"><span class="icon">⊕</span> Key Definitions</h2>
+    <dl class="def-list">
+      <dt>Active Assailant:</dt>
+      <dd>An individual or individuals actively engaged in killing or attempting to kill people in a populated area, typically using firearms but potentially using any weapon.</dd>
+
+      <dt>Casualty Collection Point (CCP):</dt>
+      <dd>A designated safe area (typically in the cold zone) where victims are brought for further triage, treatment, and preparation for ambulance transport.</dd>
+
+      <dt>Cold Zone:</dt>
+      <dd>The safe area surrounding an incident, free of active threat, where command posts, staging areas, and medical treatment areas are established.</dd>
+
+      <dt>Contact Team:</dt>
+      <dd>A small group of law enforcement officers (typically 2–4) who move together to locate and neutralize an active threat.</dd>
+
+      <dt>Force Protection:</dt>
+      <dd>Law enforcement officers assigned to provide armed security for fire/EMS personnel operating in warm zones.</dd>
+
+      <dt>Hot Zone:</dt>
+      <dd>The area of active or suspected threat where only law enforcement operates. Fire/EMS do not enter.</dd>
+
+      <dt>Incident Command System (ICS):</dt>
+      <dd>A standardized, scalable organizational structure for managing incidents, providing clear chain of command and unity of command.</dd>
+
+      <dt>Mobile Command:</dt>
+      <dd>The practice of the first arriving officer serving as incident commander while still directly engaged in the unfolding incident, prior to establishing a fixed command post.</dd>
+
+      <dt>NFPA 3000:</dt>
+      <dd>The National Fire Protection Association standard for active shooter/hostile event response programs, establishing best practices for unified response.</dd>
+
+      <dt>NIMS:</dt>
+      <dd>The National Incident Management System, providing principles for multi-agency coordination including common terminology, unified command, and resource management.</dd>
+
+      <dt>Rescue Task Force (RTF):</dt>
+      <dd>A unified team of fire/EMS personnel and law enforcement officers formed to treat and evacuate victims in the warm zone under armed escort.</dd>
+
+      <dt>Rescue Team(s):</dt>
+      <dd>Law enforcement resources whose mission is to enter the hot zone to rescue a victim. They are configured to search for and extract the injured from the hot zone to the warm zone, a CCP, or the Treatment Area/Cold Zone.</dd>
+
+      <dt>TECC (Tactical Emergency Casualty Care):</dt>
+      <dd>Civilian adaptation of military combat casualty care principles, guiding medical treatment in high-threat environments with phases for direct threat, indirect threat, and evacuation care.</dd>
+
+      <dt>THREAT Protocol:</dt>
+      <dd>Response model from the Hartford Consensus: Threat suppression, Hemorrhage control, Rapid Extrication, Assessment, and Transport.</dd>
+
+      <dt>Unified Command:</dt>
+      <dd>A leadership structure where commanders from multiple agencies jointly manage an incident, sharing authority, setting common objectives, and developing a single action plan.</dd>
+
+      <dt>Warm Zone:</dt>
+      <dd>An area cleared by law enforcement but not fully secured, where RTFs operate under armed escort. Personnel wear ballistic protective equipment and remain prepared for rapid withdrawal.</dd>
+    </dl>
+  </section>
+
+  <!-- 13. REFERENCES -->
+  <section id="references">
+    <h2 class="section-title"><span class="icon">⊕</span> References</h2>
+    <ol class="ref-list">
+      <li>Advanced Law Enforcement Rapid Response Training (ALERRT) Center, Texas State University.</li>
+      <li>C3 Pathways, Active Shooter Incident Management Checklist Help Guide.</li>
+      <li>California Governor's Office of Emergency Services, Law Enforcement Guide for Emergency Operations (2019).</li>
+      <li>Federal Emergency Management Agency, National Incident Management System, 3rd ed. (2017).</li>
+      <li>Federal Emergency Management Agency, ICS-100: Introduction to the Incident Command System (2018).</li>
+      <li>FIRESCOPE California, ICS-701: Unified Response to Violence Incidents (2023).</li>
+      <li>Hartford Consensus, THREAT Protocol for Active Shooter/Mass Violence Response.</li>
+      <li>International Association of Chiefs of Police, Active Shooter: Model Policy (2014).</li>
+      <li>National Fire Protection Association, NFPA 3000: Standard for an Active Shooter/Hostile Event Response (ASHER) Program (2018).</li>
+      <li>National Fire Protection Association, NFPA 1561: Standard on Emergency Services Incident Management System and Command Safety (2020).</li>
+      <li>National Tactical Officers Association, Active Shooter—ASIM Checklist (2015).</li>
+      <li>U.S. Fire Administration, Fire/EMS Operational Considerations and Guide for Active Shooter and Mass Casualty Incidents (2013).</li>
+    </ol>
+  </section>
+
+</div>
+
+<footer>
+  URVI Framework · Los Angeles County Public Safety Agencies · Operational Guidelines
+</footer>
+
+</body>
+</html>
