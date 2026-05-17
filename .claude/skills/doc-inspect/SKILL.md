@@ -1,18 +1,27 @@
 ---
-description: Document restoration pipeline — Step 1 of 10. Inspector. Run this first on any PDF you want professionally restored. Reads and catalogs every piece of content, extracts annotations and reviewer comments, and identifies issues across structure, language, formatting, visuals, layout, and professionalism. Creates the restoration_project/ workspace and STATUS.md tracker. After this runs, proceed to /doc-pm for the project manager intake interview.
+description: Document pipeline — Step 1 of 10. Inspector & Brief Taker. The single entry point for both restoration and creation. If a PDF is present, inspects and catalogs its content, extracts annotations, and identifies issues. If no PDF is present, interviews you to capture what you want to create. Either way, produces the same output that all downstream skills expect. After this runs, proceed to /doc-pm.
 ---
 
-You are the Inspector — Step 1 of a 10-step document restoration pipeline. Your job is to thoroughly read the source PDF and produce a complete content inventory and issue catalog. You create the workspace and hand the findings to the Project Manager.
+You are the Inspector — Step 1 of a 10-step document pipeline. You handle two modes automatically:
 
-## Step 1: Find the Source PDF
+- **Restoration mode:** A PDF exists — you read, extract, and catalog its content and issues.
+- **Creation mode:** No PDF exists — you interview the user and build a content brief.
 
-Check if a PDF exists in the current working directory:
+Both modes produce identical output that all downstream skills consume the same way.
+
+---
+
+## Step 1: Detect Mode
+
+Check for a PDF in the current working directory:
 
 ```bash
 find . -maxdepth 2 -name "*.pdf" | sort
 ```
 
-If exactly one PDF is found, proceed with it. If multiple are found, list them and ask the user which one to restore. If none are found, ask the user for the filename or path.
+- **One PDF found:** Proceed in **Restoration mode** with that file.
+- **Multiple PDFs found:** List them and ask the user which one to use, then proceed in Restoration mode.
+- **No PDF found:** Proceed in **Creation mode**.
 
 ---
 
@@ -24,12 +33,13 @@ Create the `restoration_project/` directory and initialize `STATUS.md`:
 mkdir -p restoration_project
 ```
 
-Write `restoration_project/STATUS.md` with this exact structure:
+Write `restoration_project/STATUS.md`:
 
 ```markdown
-# Document Restoration Pipeline — Status Tracker
+# Document Pipeline — Status Tracker
 
-**Source PDF:** <filename>
+**Mode:** Restoration / Creation  ← set appropriately
+**Source:** <PDF filename or "New document — created from brief">
 **Started:** <today's date>
 
 ## Pipeline Steps
@@ -50,28 +60,29 @@ Write `restoration_project/STATUS.md` with this exact structure:
 
 ---
 
-## Step 3: Extract Main Text Content
+## RESTORATION MODE
 
-Use the Read tool to read the PDF file. Extract all content including:
+_Follow this path if a PDF was found._
+
+### R1: Extract Main Text Content
+
+Use the Read tool to read the PDF. Extract all content:
 - All body text, preserving paragraph breaks
-- Headings (note their apparent level — H1, H2, H3 etc.)
+- Headings (note apparent level — H1, H2, H3 etc.)
 - List items (bullets, numbered)
-- Table content (capture all cells)
-- Any captions, footnotes, or sidebars
+- Table content (all cells)
+- Captions, footnotes, sidebars
 
-Organize the extracted text section by section, noting page numbers where possible.
+Organize section by section, noting page numbers where possible.
 
 ---
 
-## Step 4: Extract PDF Annotations and Comments
+### R2: Extract PDF Annotations and Comments
 
-Write and run a Python script to extract annotations (reviewer comments, suggestion bubbles, tracked-change notes) that are stored as PDF annotation objects — these are separate from the main text stream and won't appear in a plain text read:
+Run a Python script to extract annotation objects (reviewer comments, suggestion bubbles, tracked-change notes) that live outside the main text stream:
 
 ```python
-import subprocess
-import sys
-
-# Install pymupdf if needed
+import subprocess, sys
 try:
     import fitz
 except ImportError:
@@ -80,7 +91,6 @@ except ImportError:
 
 doc = fitz.open("YOUR_PDF_FILENAME_HERE")
 annotations = []
-
 for page_num, page in enumerate(doc):
     for annot in page.annots():
         info = annot.info
@@ -101,91 +111,54 @@ if annotations:
         print()
 else:
     print("No annotations found in this PDF.")
-
 doc.close()
 ```
 
-Also check for apparent tracked-change artifacts in the main text: look for strikethrough text patterns, duplicate adjacent paragraphs, or color-differentiated runs that may indicate unresolved Word tracked changes baked into the PDF rendering.
+Also flag apparent tracked-change artifacts in the main text: strikethrough patterns, duplicate adjacent paragraphs, color-differentiated runs.
 
 ---
 
-## Step 5: Catalog Issues
+### R3: Catalog Issues
 
-Review all extracted content and build a structured issue inventory. For each issue, note the section, the specific problem, and its severity (High / Medium / Low).
+Review extracted content and build a structured issue inventory. For each issue, note section, problem, and severity (High / Medium / Low) under six categories:
 
-Categorize issues under these six headings:
-
-### Structure Issues
-- Missing or misaligned heading levels
-- Sections in illogical order
-- Missing expected sections (e.g., no conclusion, no executive summary)
-- Redundant or duplicate sections
-
-### Language Issues
-- Grammatical errors
-- Passive voice overuse
-- Unprofessional or inconsistent tone
-- Filler words, hedging language
-- Inconsistent tense
-
-### Formatting Issues
-- Inconsistent bullet/list style
-- Missing bold on key terms
-- Inconsistent paragraph spacing
-- Tables without headers or alignment
-
-### Visuals Issues
-- Figures without captions
-- Images referenced in text but no description available
-- Diagrams that appear low-quality or unclear
-- Charts without axis labels or legends mentioned
-
-### Layout Issues
-- Apparent page break problems
-- Content that appears misaligned
-- Missing headers/footers
-- Margin or spacing inconsistencies
-
-### Professionalism Issues
-- Acronyms not defined on first use
-- Cross-references that appear broken
-- Inconsistent terminology (same concept, different words)
-- Missing document metadata elements
+**Structure:** heading level errors, illogical section order, missing/redundant sections  
+**Language:** grammar, passive voice overuse, inconsistent tone, filler words  
+**Formatting:** inconsistent bullets/lists, missing bold on key terms, table formatting  
+**Visuals:** figures without captions, unclear diagrams, unreferenced images  
+**Layout:** page break problems, misalignment, missing headers/footers  
+**Professionalism:** undefined acronyms, broken cross-references, inconsistent terminology
 
 ---
 
-## Step 6: Write the Inspection Report
+### R4: Write the Inspection Report
 
-Save `restoration_project/01_inspection.md` with these sections:
+Save `restoration_project/01_inspection.md`:
 
 ```markdown
 # Document Inspection Report
 
+**Mode:** Restoration
 **Source:** <filename>
 **Date:** <today>
-**Inspector:** doc-inspect (Step 1 of 10)
 
 ---
 
 ## Document Overview
 
-[Brief summary: what is this document? Estimated length, apparent purpose, intended audience, document type]
+[What is this document? Purpose, audience, document type, estimated length]
 
 ---
 
 ## Full Extracted Text
 
-[Complete text content, organized by section with heading levels preserved]
+[Complete content, section by section, headings preserved]
 
 ---
 
 ## Annotation Inventory
 
-[List of all reviewer comments/annotations found, or "No annotations found"]
-
-For each annotation:
-- **Page:** X | **Type:** <type> | **Author:** <author if present>
-- **Comment:** <content>
+[All reviewer comments/annotations, or "No annotations found"]
 
 ---
 
@@ -194,78 +167,204 @@ For each annotation:
 ### Structure
 | # | Section | Issue | Severity |
 |---|---------|-------|----------|
-| 1 | ... | ... | High/Med/Low |
 
 ### Language
-| # | Section | Issue | Severity |
-...
-
 ### Formatting
-...
-
 ### Visuals
-...
-
 ### Layout
-...
-
 ### Professionalism
-...
 
 ---
 
 ## Issue Summary
 
-- Structure: X issues (X High, X Medium, X Low)
-- Language: X issues
-- Formatting: X issues
-- Visuals: X issues
-- Layout: X issues
-- Professionalism: X issues
-- **Total:** X issues across Y categories
-- **Annotations found:** X reviewer comments
+- Structure: X issues | Language: X | Formatting: X | Visuals: X | Layout: X | Professionalism: X
+- **Total:** X issues
+- **Annotations found:** X
 ```
 
 ---
 
-## Step 7: Self-Verify
+### R5: Self-Verify (Restoration)
 
-Before marking complete, verify:
-- [ ] `restoration_project/` directory exists
-- [ ] `restoration_project/STATUS.md` exists with all 10 steps listed
-- [ ] `restoration_project/01_inspection.md` exists
-- [ ] The inspection report contains the full extracted text (not just a summary)
-- [ ] The annotation extraction was attempted (even if result was 0)
-- [ ] The issue inventory has at least one category populated
-- [ ] Issue counts in the summary match the actual table entries
-
-If any check fails, fix it before proceeding.
+- [ ] Full extracted text present (not just a summary)
+- [ ] Annotation extraction attempted (even if 0 results)
+- [ ] Issue inventory populated with at least one category
+- [ ] Issue counts in summary match table entries
 
 ---
 
-## Step 8: Update STATUS.md
-
-Update the Step 1 row in `restoration_project/STATUS.md`:
-
-```
-| 1 | doc-inspect | ✅ Complete | Found X issues, Y annotations |
-```
-
----
-
-## Step 9: Signal Completion
-
-Print this message to the user:
+### R6: Signal Completion (Restoration)
 
 ```
 ✅ Inspection complete.
 
 Source: <filename>
 Extracted text: ~X words across Y sections
-Annotations found: Z reviewer comments
+Annotations found: Z
 Issues flagged: N total (Structure: X | Language: X | Formatting: X | Visuals: X | Layout: X | Professionalism: X)
 
-All findings saved to: restoration_project/01_inspection.md
+Output: restoration_project/01_inspection.md
 
-▶ Next step: Run /doc-pm — the Project Manager will review these findings and interview you to set the restoration priorities.
+▶ Next step: Run /doc-pm
+```
+
+---
+
+## CREATION MODE
+
+_Follow this path if no PDF was found._
+
+### C1: Brief Interview
+
+Tell the user:
+
+> "No document found — switching to creation mode. I'll ask you a few questions to understand what you want to build, then hand it off to the Project Manager."
+
+Ask the following questions (you can ask all at once):
+
+```
+1. What type of document are you creating?
+   (e.g., policy document, report, proposal, manual, training guide, 
+   standard operating procedure, strategic plan, grant application, other)
+
+2. What is the document's purpose in one or two sentences?
+   (What should a reader be able to do or know after reading it?)
+
+3. Who is the audience?
+   (e.g., government officials, technical staff, general public, executive leadership)
+
+4. What sections or topics must the document cover?
+   (List everything you know — we can organize it later. 
+   Include any required sections for this document type.)
+
+5. Do you have any existing content to include?
+   (Notes, bullet points, outlines, data, quotes, references — 
+   paste them here or describe what you have.)
+
+6. Any style, tone, or format requirements?
+   (e.g., formal government style, must follow a specific template, 
+   maximum page count, required branding colors or fonts)
+
+7. What's the working title?
+```
+
+Wait for the user's answers. Ask follow-up questions if any answer is unclear or too vague to build from.
+
+---
+
+### C2: Build the Content Brief
+
+From the user's answers, draft a structured content brief. This becomes the "extracted text" equivalent — the raw material the downstream skills will work from.
+
+Organize it as:
+- Document purpose and audience statement
+- Proposed section outline (H1/H2/H3 hierarchy)
+- Known content mapped to each section
+- Gaps clearly marked: `[CONTENT NEEDED: describe what goes here]`
+- Any required references, data points, or visuals the user mentioned
+
+---
+
+### C3: Write the Inspection Report
+
+Save `restoration_project/01_inspection.md`:
+
+```markdown
+# Document Brief — Creation Mode
+
+**Mode:** Creation
+**Working Title:** <title>
+**Document Type:** <type>
+**Date:** <today>
+
+---
+
+## Document Overview
+
+**Purpose:** <from user>
+**Audience:** <from user>
+**Style/Tone:** <from user>
+**Known constraints:** <page limits, templates, branding, etc.>
+
+---
+
+## Content Brief
+
+[Structured outline with all known content mapped to sections.
+Gaps marked as: [CONTENT NEEDED: description]]
+
+---
+
+## Issue Inventory
+
+### Structure
+| # | Issue | Severity |
+|---|-------|----------|
+[Note any structural gaps, missing required sections, or logical order issues 
+identified from the brief]
+
+### Language
+[Note any tone, register, or style concerns based on user input]
+
+### Formatting
+[Note any formatting requirements or constraints from the user]
+
+### Visuals
+[Note any visuals, diagrams, or tables the user mentioned needing]
+
+### Layout
+[Note any layout requirements: page count, templates, column structure]
+
+### Professionalism
+[Note any terminology to define, acronyms to watch, or consistency needs]
+
+---
+
+## Issue Summary
+
+- Structure: X issues | Language: X | Formatting: X | Visuals: X | Layout: X | Professionalism: X
+- **Total:** X issues
+- **Mode:** Creation — content gaps are tracked as Structure issues
+```
+
+---
+
+### C4: Self-Verify (Creation)
+
+- [ ] All 7 interview questions answered (or follow-up clarification received)
+- [ ] Content brief covers all sections the user requested
+- [ ] Gaps clearly marked with `[CONTENT NEEDED: ...]`
+- [ ] Issue inventory reflects creation gaps, not just restoration defects
+
+---
+
+### C5: Signal Completion (Creation)
+
+```
+✅ Brief complete.
+
+Document: <working title>
+Type: <document type>
+Sections outlined: X
+Content gaps identified: X (marked for the PM to prioritize)
+
+Output: restoration_project/01_inspection.md
+
+▶ Next step: Run /doc-pm — the Project Manager will review the brief 
+  and set priorities for building out the document.
+```
+
+---
+
+## Step 3: Update STATUS.md
+
+**Restoration:**
+```
+| 1 | doc-inspect | ✅ Complete | Restoration — X issues, Y annotations |
+```
+
+**Creation:**
+```
+| 1 | doc-inspect | ✅ Complete | Creation — brief captured, X sections, Y content gaps |
 ```
