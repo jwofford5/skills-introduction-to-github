@@ -252,6 +252,48 @@ def add_page_break(doc):
     run._element.append(br)
 
 
+def add_toc_field(doc, switches='\\o "1-3" \\h \\z \\u'):
+    """Insert a Word auto-TOC field. Word populates it when the doc opens
+    (provided updateFields is set to true in settings)."""
+    p = doc.add_paragraph()
+    run1 = p.add_run()
+    fldChar1 = OxmlElement("w:fldChar")
+    fldChar1.set(qn("w:fldCharType"), "begin")
+    fldChar1.set(qn("w:dirty"), "true")
+    run1._element.append(fldChar1)
+
+    run2 = p.add_run()
+    instrText = OxmlElement("w:instrText")
+    instrText.set(qn("xml:space"), "preserve")
+    instrText.text = f" TOC {switches} "
+    run2._element.append(instrText)
+
+    run3 = p.add_run()
+    fldChar2 = OxmlElement("w:fldChar")
+    fldChar2.set(qn("w:fldCharType"), "separate")
+    run3._element.append(fldChar2)
+
+    run4 = p.add_run("Right-click and choose Update Field to populate the Table of Contents.")
+    set_run_font(run4, name="Times New Roman", size_pt=11, italic=True)
+
+    run5 = p.add_run()
+    fldChar3 = OxmlElement("w:fldChar")
+    fldChar3.set(qn("w:fldCharType"), "end")
+    run5._element.append(fldChar3)
+
+
+def enable_auto_update_fields(doc):
+    """Set <w:updateFields w:val="true"/> in settings.xml so Word refreshes
+    fields (TOC, page numbers) when the document is opened."""
+    settings = doc.settings.element
+    # Remove any existing updateFields to avoid duplicates
+    for existing in settings.findall(qn("w:updateFields")):
+        settings.remove(existing)
+    el = OxmlElement("w:updateFields")
+    el.set(qn("w:val"), "true")
+    settings.append(el)
+
+
 def make_heading(doc, text, level, is_first_h2):
     # Use Word's built-in Heading styles so auto-TOC, navigation, and outline view all work.
     style_name = f"Heading {min(level, 9)}"
@@ -531,6 +573,8 @@ def main():
 
     h2_count = 0
     skip_first_h1 = False
+    in_plaintext_toc = False  # When true, suppress blocks (we replaced TOC with a field)
+    body_started = False  # Suppress source's cover-duplicate paragraph before first H2
     for blk in blocks:
         if blk.kind == "heading":
             if blk.level == 1:
@@ -538,14 +582,28 @@ def main():
                 if not skip_first_h1:
                     skip_first_h1 = True
                     continue
+                in_plaintext_toc = False
                 make_heading(doc, blk.text, 1, is_first_h2=False)
             elif blk.level == 2:
                 # Detect numbered major sections (e.g., "1. EXECUTIVE SUMMARY", "TABLE OF CONTENTS", "FIGURE 1: ...")
+                in_plaintext_toc = False
+                body_started = True
                 is_first_h2 = (h2_count == 0)
                 make_heading(doc, blk.text, 2, is_first_h2=is_first_h2)
                 h2_count += 1
+                if blk.text.strip().upper() == "TABLE OF CONTENTS":
+                    # Insert a Word auto-TOC field; suppress the source's plain-text list
+                    add_toc_field(doc)
+                    in_plaintext_toc = True
             else:
                 make_heading(doc, blk.text, blk.level, is_first_h2=False)
+        elif not body_started:
+            # Everything before the first H2 is cover-duplicate content (subtitle,
+            # "Prepared by...", agency line) — already rendered on the cover page.
+            continue
+        elif in_plaintext_toc:
+            # Skip any blocks that are part of the original plain-text TOC
+            continue
         elif blk.kind == "para":
             make_paragraph(doc, blk.text)
         elif blk.kind == "list":
@@ -559,6 +617,9 @@ def main():
         elif blk.kind == "hr":
             # Treat as visual separator — small spacing paragraph; suppress consecutive HRs
             continue
+
+    # ----- Auto-update fields on open (populates the TOC field) -----
+    enable_auto_update_fields(doc)
 
     # ----- Save -----
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
@@ -583,6 +644,70 @@ def main():
     # Estimate pages ~ 350 words/page for Times New Roman 11pt 1.15 spacing
     est_pages = max(1, (word_count // 350) + 4)  # +cover, +TOC, +figure, +section page breaks
     print(f"Estimated pages: ~{est_pages}")
+
+    # ----- PDF export -----
+    pdf_path = os.path.abspath(OUTPUT.replace(".docx", ".pdf"))
+    docx_abs = os.path.abspath(OUTPUT)
+    if export_pdf_via_word(docx_abs, pdf_path):
+        print(f"PDF generated: {pdf_path}")
+    else:
+        print("PDF conversion not available — open the .docx in Word and use File → Save As → PDF.")
+
+
+def export_pdf_via_word(docx_abs, pdf_abs):
+    """Convert .docx → .pdf. Tries (1) Word + update-fields, (2) Pages export.
+    Falls back gracefully if both fail."""
+    import subprocess
+
+    # Step 1: open the doc in Word and update fields so the TOC is populated.
+    # This Word version's AppleScript dictionary rejects `save as PDF` but
+    # accepts `update fields` and `save`. We refresh fields and re-save the
+    # docx, then hand off to a different tool for the PDF.
+    refresh_script = f'''
+    tell application "Microsoft Word"
+        activate
+        open file name "{docx_abs}"
+        set theDoc to active document
+        update fields theDoc
+        save theDoc
+        close theDoc saving no
+    end tell
+    '''
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", refresh_script],
+            capture_output=True, text=True, timeout=120
+        )
+        if result.returncode != 0:
+            print(f"Word field refresh stderr: {result.stderr.strip()}")
+        else:
+            print("Word field refresh: TOC populated and .docx re-saved.")
+    except Exception as e:
+        print(f"Word refresh failed: {e}")
+
+    # Step 2: PDF export via Pages (well-supported AppleScript export to PDF)
+    pages_script = f'''
+    tell application "Pages"
+        activate
+        set theDoc to open (POSIX file "{docx_abs}")
+        delay 2
+        export theDoc to (POSIX file "{pdf_abs}") as PDF
+        close theDoc saving no
+    end tell
+    '''
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", pages_script],
+            capture_output=True, text=True, timeout=120
+        )
+        if result.returncode == 0 and os.path.exists(pdf_abs):
+            print("PDF exported via Pages.")
+            return True
+        print(f"Pages export stderr: {result.stderr.strip()}")
+    except Exception as e:
+        print(f"Pages export failed: {e}")
+
+    return False
 
 
 if __name__ == "__main__":
