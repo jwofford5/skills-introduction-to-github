@@ -519,49 +519,78 @@ def _blank_cell(cell):
 
 
 def make_urvi_org_chart(doc):
-    """Render the URVI command-structure org chart as a 5-row × 4-col table:
-       Row 0: Unified Command (spans 4)
-       Row 1: vertical connector (spans 4)
-       Row 2: Contact Group (cols 0-1) | Rescue Group (cols 2-3)
-       Row 3: four connectors, one per leaf box
-       Row 4: Contact Team 1 | Contact Team 2 | RTF 1 | RTF 2
+    """Render the URVI command-structure org chart as a 5-row × 7-col table.
+    Spacer columns (1, 3, 5) give each node its own visible box with
+    whitespace between siblings — adjacent shaded cells with shared borders
+    would otherwise merge visually into one wide compartmentalized block.
+
+    Grid layout (B = box, S = spacer, V = vertical connector):
+        Col:  0   1   2   3   4   5   6
+        R0:   ┌────── Unified Command ──────┐
+        R1:   ┌─────────── │ ───────────────┐
+        R2:   ┌── Contact ──┐ S ┌── Rescue ──┐
+        R3:   V   .   V   .   V   .   V
+        R4:   B   .   B   .   B   .   B
     """
-    table = doc.add_table(rows=5, cols=4)
+    table = doc.add_table(rows=5, cols=7)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
-    for row in table.rows:
-        for cell in row.cells:
-            cell.width = Inches(1.5)
 
-    # Row 0 — top box (merged across all 4 columns)
+    # Column widths — box columns are wider than spacer columns
+    # 4 boxes × 1.30" + 3 spacers × 0.43" = 5.20 + 1.29 = 6.49" (full content width)
+    BOX_W = 1.30
+    SPACER_W = 0.43
+    col_widths_in = [BOX_W, SPACER_W, BOX_W, SPACER_W, BOX_W, SPACER_W, BOX_W]
+
+    # Set grid widths so Word and Pages respect the layout
+    tblGrid = table._tbl.find(qn("w:tblGrid"))
+    gridCols = tblGrid.findall(qn("w:gridCol"))
+    for col, w_in in zip(gridCols, col_widths_in):
+        col.set(qn("w:w"), str(int(w_in * 1440)))  # inches → twips (1 inch = 1440)
+        col.set(qn("w:type"), "dxa")
+
+    # Also set each cell's preferred width
+    for row in table.rows:
+        for cell, w_in in zip(row.cells, col_widths_in):
+            cell.width = Inches(w_in)
+
+    # Row 0 — Unified Command (merged across all 7 columns)
     r0 = table.rows[0]
-    top = r0.cells[0].merge(r0.cells[3])
+    top = r0.cells[0].merge(r0.cells[6])
     _box_cell(top, "Unified Command", subtitle="(Law Enforcement / Fire / EMS)")
 
-    # Row 1 — single vertical connector under the top box
+    # Row 1 — vertical connector below Unified Command (merged across all 7)
     r1 = table.rows[1]
-    conn1 = r1.cells[0].merge(r1.cells[3])
+    conn1 = r1.cells[0].merge(r1.cells[6])
     _connector_cell(conn1)
 
-    # Row 2 — two supervisor boxes
+    # Row 2 — Contact Group (cols 0-2), spacer (col 3), Rescue Group (cols 4-6)
     r2 = table.rows[2]
-    contact = r2.cells[0].merge(r2.cells[1])
+    contact = r2.cells[0].merge(r2.cells[2])
     _box_cell(contact, "Contact Group", subtitle="(Supervisor)")
-    rescue = r2.cells[2].merge(r2.cells[3])
+    _blank_cell(r2.cells[3])
+    rescue = r2.cells[4].merge(r2.cells[6])
     _box_cell(rescue, "Rescue Group", subtitle="(Supervisor)")
 
-    # Row 3 — connectors above each of the 4 leaf boxes
+    # Row 3 — vertical connectors above each leaf box; spacers in between
     r3 = table.rows[3]
-    for c in r3.cells:
-        _connector_cell(c)
+    for idx, c in enumerate(r3.cells):
+        if idx in (0, 2, 4, 6):
+            _connector_cell(c)
+        else:
+            _blank_cell(c)
 
-    # Row 4 — four leaf boxes
+    # Row 4 — four leaf boxes (CT1, CT2, RTF 1, RTF 2) separated by spacers
     r4 = table.rows[4]
     labels = ["Contact Team 1", "Contact Team 2", "RTF 1", "RTF 2"]
-    for cell, label in zip(r4.cells, labels):
-        _box_cell(cell, label, subtitle=None)
+    label_iter = iter(labels)
+    for idx, c in enumerate(r4.cells):
+        if idx in (0, 2, 4, 6):
+            _box_cell(c, next(label_iter), subtitle=None)
+        else:
+            _blank_cell(c)
 
-    # Spacer after the chart
+    # Trailing spacer paragraph so the caption isn't flush against the chart
     spacer = doc.add_paragraph()
     spacer.paragraph_format.space_before = Pt(0)
     spacer.paragraph_format.space_after = Pt(6)
@@ -750,10 +779,12 @@ def main():
                 make_heading(doc, blk.text, 2, is_first_h2=is_first_h2)
                 h2_count += 1
                 if blk.text.strip().upper() == "TABLE OF CONTENTS":
-                    # Insert a Word auto-TOC field; suppress the source's plain-text list.
-                    # No forced page break afterward — body content flows naturally so we
-                    # don't strand half-empty pages.
+                    # Insert a Word auto-TOC field and force a page break afterward so
+                    # the first body section starts at the top of a fresh page. This
+                    # is the only forced page break inside the body — section flow
+                    # otherwise pages naturally so short sections don't strand whitespace.
                     add_toc_field(doc)
+                    add_page_break(doc)
                     in_plaintext_toc = True
             else:
                 make_heading(doc, blk.text, blk.level, is_first_h2=False)

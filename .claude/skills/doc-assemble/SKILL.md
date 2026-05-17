@@ -70,7 +70,7 @@ Write a complete Python script that:
    - Margins: 1 inch all sides
    - Line spacing: 1.15 or as noted in layout annotations
    - Color: black for body and most headings; dark red (#8B0000) as accent for cover, heading rules, callout headers, and figure-table borders
-   - **No `page_break_before` on Heading 2.** Sections flow naturally. The only forced page breaks are: after the cover page, and (optionally) once after a multi-page TOC if body content would otherwise start mid-page on the same sheet as a TOC tail. Forced section breaks strand half-empty pages and look unprofessional — avoid them.
+   - **No `page_break_before` on Heading 2.** Sections flow naturally. The only forced page breaks are: (1) after the cover page, and (2) after the TOC field — so the first body section starts at the top of a fresh page. Both are deliberate front-matter transitions, not stranded mid-section whitespace. Do NOT force breaks between body sections — that strands half-empty pages and looks unprofessional.
 
    **Technical:**
    - Font: Calibri, 11pt body
@@ -115,6 +115,7 @@ Write a complete Python script that:
    - Each "connector" row is a borderless, fillless row containing a centered dark red vertical-bar character (`│`).
    - Parent boxes span their children's columns via cell merges.
    - Detect the ASCII diagram source by checking for known structural strings (e.g., "Unified Command" + "RTF" for the URVI org chart) and route to the structured-table renderer.
+   - **Use spacer columns between sibling nodes.** Adjacent cells with dark red borders share an edge and read as one wide compartmentalized block, not as separate boxes. Insert a narrow no-border, no-fill column between each pair of siblings so each node is a visibly separate box with whitespace around it. For an N-leaf chart: build a `(2N - 1)`-column grid where odd-indexed columns are spacers and even-indexed columns are content. Use the column-grid mechanism (`w:tblGrid` / `w:gridCol`) to assign explicit widths — Word's autofit will otherwise collapse spacer columns. Reasonable widths: 1.30" per content column, 0.43" per spacer (4 content + 3 spacers = ~6.5" content width on Letter).
 
 4. **Adds running header** on pages 2 and beyond:
    ```python
