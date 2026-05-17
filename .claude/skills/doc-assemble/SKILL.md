@@ -130,6 +130,8 @@ Write a complete Python script that:
    heading_paragraph.paragraph_format.keep_with_next = True
    ```
 
+6. **Binds tight lists so they don't split across pages.** A list of ≤ 6 items (the "tight list" threshold) should stay together as a single block. Apply `keep_with_next` to every list item except the last, so Word treats the list as one indivisible group. Additionally, if a tight list immediately follows a paragraph that ends with a colon (a classic introducer pattern, e.g., "The MARCH algorithm steps:"), apply `keep_with_next` to that paragraph too — otherwise the lead-in can strand at the bottom of one page while its bullets continue on the next. For lists of > 6 items, allow natural pagination so a long list doesn't push half a page of white space ahead of itself.
+
 6. **Saves the file:**
    ```python
    output_path = "restoration_project/FINAL_DOCUMENT.docx"

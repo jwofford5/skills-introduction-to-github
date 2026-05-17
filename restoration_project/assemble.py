@@ -423,30 +423,38 @@ def make_callout_box(doc, lines):
     spacer.paragraph_format.space_after = Pt(4)
 
 
+TIGHT_LIST_THRESHOLD = 6  # Lists at or below this many items are kept together on one page
+
+
 def make_list(doc, items):
-    """Render a list of (kind, text) tuples."""
-    for kind, txt in items:
+    """Render a list of (kind, text) tuples. Tight lists (≤ TIGHT_LIST_THRESHOLD
+    items) get keep_with_next on every item except the last, so Word treats the
+    whole list as a single block and won't break it across pages. Longer lists
+    are allowed to flow naturally."""
+    tight = len(items) <= TIGHT_LIST_THRESHOLD
+    last_idx = len(items) - 1
+    for i, (kind, txt) in enumerate(items):
         # Checklist items: text starts with ☐
         if txt.startswith("☐"):
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.25)
             p.paragraph_format.first_line_indent = Inches(-0.25)
             p.paragraph_format.space_after = Pt(3)
-            # Use Wingdings ☐ glyph (cleaner) — fall back to Unicode if Wingdings unavailable
             run = p.add_run("☐ ")
             set_run_font(run, name="Times New Roman", size_pt=11)
-            # Remaining text after ☐
             remainder = txt[1:].lstrip()
             add_inline_runs(p, remainder, base_size=11)
+            if tight and i < last_idx:
+                keep_with_next(p)
             continue
 
-        # Phase transition header style (already bold ** in source)
         p = doc.add_paragraph(style="List Bullet" if kind == "bullet" else "List Number")
         p.paragraph_format.space_after = Pt(3)
-        # Strip out existing default run added by style
         for r in list(p.runs):
             r.text = ""
         add_inline_runs(p, txt, base_size=11)
+        if tight and i < last_idx:
+            keep_with_next(p)
 
 
 def make_paragraph(doc, text):
@@ -761,7 +769,18 @@ def main():
     in_plaintext_toc = False  # When true, suppress blocks (we replaced TOC with a field)
     body_started = False  # Suppress source's cover-duplicate paragraph before first H2
     last_heading_text = None  # Used to drop a paragraph that just re-states the heading
-    for blk in blocks:
+
+    def next_visible_block(start_idx):
+        """Return the next block from start_idx onward that would actually
+        render. Used to peek for tight-list followers."""
+        for j in range(start_idx, len(blocks)):
+            b = blocks[j]
+            if b.kind == "hr":
+                continue
+            return b
+        return None
+
+    for idx, blk in enumerate(blocks):
         if blk.kind == "heading":
             last_heading_text = blk.text.strip().upper()
             if blk.level == 1:
@@ -803,6 +822,13 @@ def main():
             if last_heading_text and stripped == last_heading_text:
                 continue
             make_paragraph(doc, blk.text)
+            # If this paragraph introduces a tight list (ends with ":" and the
+            # next block is a list of ≤ TIGHT_LIST_THRESHOLD items), bind it to
+            # that list so Word keeps the lead-in on the same page as its items.
+            if blk.text.rstrip().endswith(":"):
+                nxt = next_visible_block(idx + 1)
+                if nxt is not None and nxt.kind == "list" and len(nxt.items) <= TIGHT_LIST_THRESHOLD:
+                    keep_with_next(doc.paragraphs[-1])
         elif blk.kind == "list":
             make_list(doc, blk.items)
         elif blk.kind == "blockquote":
