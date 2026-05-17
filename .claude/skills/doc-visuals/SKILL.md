@@ -100,18 +100,38 @@ For each visual element, add a description block in the document that could serv
 ### Diagram Recreation (where applicable)
 
 For diagrams that can be meaningfully represented in text or structured format — particularly:
-- Flowcharts → recreate as numbered steps or ASCII flow
-- Org charts → recreate as indented hierarchy
+- Flowcharts → recreate as numbered steps
+- Org charts → recreate as indented hierarchy + a structured-table spec for assembly
 - Simple process diagrams → recreate as numbered sequence
 - Data tables → reformat as clean markdown table
 
 Ask the user before recreating: "I can recreate [Diagram X] as [format]. Would you like me to?"
 
-If approved, provide the text recreation as a suggested replacement within the content, clearly marked:
+If approved, provide the text recreation as a suggested replacement within the content, clearly marked. **Do not specify ASCII art as the final rendering target** — ASCII is an editor-friendly preview only. The assembly step (doc-assemble) renders structured diagrams as Word tables with shaded cells, dark red borders, and vertical connector lines. Always include an assembly note describing the structured-table representation:
 
 ```
 <!-- visual: Figure 2 — text recreation (replaces original diagram if approved)
-[ASCII or structured text version]
+[indented hierarchy or sketch — for human review only]
+-->
+
+<!-- visual: Figure 2 — assembly spec (FOR doc-assemble)
+  Structured table: N rows × M cols, with merged cells for parent nodes.
+  Each node box: light gray fill (#F2F2F2), dark red border (#8B0000, 1pt), centered bold title.
+  Connector rows: no border, no fill, vertical bar character in dark red.
+-->
+```
+
+### Callout Box Specifications
+
+When the source document contains callout boxes (highlighted side panels, definition boxes, key-takeaway blocks), document a Word assembly spec — **do not** rely on shaded paragraphs with manual borders, which render with gaps and right-edge clipping across PDF viewers. Always specify the table form:
+
+```
+<!-- visual: Callout Box N — assembly spec (FOR doc-assemble)
+  Render as a 2-row, 1-column Word table.
+  Row 1 (header): dark red fill (#8B0000), white bold ALL CAPS text, centered.
+  Row 2 (body): light gray fill (#F2F2F2), each original line a separate paragraph.
+  Outer border: 1.5pt dark red (#8B0000) on all sides.
+  Full content width; vertical-center the header text.
 -->
 ```
 
