@@ -53,11 +53,16 @@ Write a complete Python script that:
    - `- item` or `* item` → List Bullet style
    - `1. item` → List Number style
    - `**bold text**` → bold run within paragraph
+   - `*italic text*` → italic run within paragraph (single asterisk; must NOT swallow `**bold**`)
    - `` `code` `` → monospace run
-   - Table syntax → Word table
+   - `> blockquote` → callout box (rendered as Word table — see step 4)
+   - ` ```fenced code``` ` → Courier code block, or routed to structured diagram renderer if the code matches a known diagram fingerprint (see step 5)
+   - `| col | col |` table syntax → Word table
    - `<!-- ... -->` HTML comments → skip (do not render)
    - Blank line between paragraphs → paragraph break
-   - `---` → page break (if preceded by a major section end) or horizontal rule
+   - `---` → horizontal rule / visual separator (do NOT auto-convert to page break)
+
+   **Inline parsing must use ordered-alternation regex** so `**bold**` is consumed as bold before its inner content matches the `*italic*` rule. A naïve `*[^*]+*` pattern run first will eat the inner half of every bold run. Reference pattern: `(\*\*[^*]+\*\*|`[^`]+`|\*[^*\n]+?\*)` with bold matched first. Italic uses non-greedy single-line matching so an unmatched asterisk in a long paragraph doesn't swallow downstream text.
 
 2. **Applies document type styling** (from WORK_ORDER.md):
 
@@ -115,9 +120,20 @@ Write a complete Python script that:
    - Each "connector" row is a borderless, fillless row containing a centered dark red vertical-bar character (`│`).
    - Parent boxes span their children's columns via cell merges.
    - Detect the ASCII diagram source by checking for known structural strings (e.g., "Unified Command" + "RTF" for the URVI org chart) and route to the structured-table renderer.
-   - **Use spacer columns between sibling nodes.** Adjacent cells with dark red borders share an edge and read as one wide compartmentalized block, not as separate boxes. Insert a narrow no-border, no-fill column between each pair of siblings so each node is a visibly separate box with whitespace around it. For an N-leaf chart: build a `(2N - 1)`-column grid where odd-indexed columns are spacers and even-indexed columns are content. Use the column-grid mechanism (`w:tblGrid` / `w:gridCol`) to assign explicit widths — Word's autofit will otherwise collapse spacer columns. Reasonable widths: 1.30" per content column, 0.43" per spacer (4 content + 3 spacers = ~6.5" content width on Letter).
+   - **Use spacer columns between sibling nodes.** Adjacent cells with dark red borders share an edge and read as one wide compartmentalized block, not as separate boxes. Insert a narrow no-border, no-fill column between each pair of siblings so each node is a visibly separate box with whitespace around it. For an N-leaf chart: build a `(2N - 1)`-column grid where odd-indexed columns are spacers and even-indexed columns are content. Reasonable widths: 1.30" per content column, 0.43" per spacer (4 content + 3 spacers = ~6.5" content width on Letter).
 
-4. **Adds running header** on pages 2 and beyond:
+6. **Set table column widths on `w:tblGrid` / `w:gridCol`, not just `cell.width`.** This is a non-obvious OOXML requirement that bit us during the org-chart rebuild: setting only `cell.width = Inches(X)` was *not* enough — Word and Pages applied autofit and collapsed the narrow spacer columns to almost nothing, breaking the layout. For any layout-critical table (callout boxes, org charts, comparison tables with intentionally uneven columns), assign widths directly to the `w:gridCol` elements in `w:tblGrid` (twips, where 1" = 1440):
+
+   ```python
+   tblGrid = table._tbl.find(qn("w:tblGrid"))
+   for gridCol, width_in in zip(tblGrid.findall(qn("w:gridCol")), col_widths_in):
+       gridCol.set(qn("w:w"), str(int(width_in * 1440)))
+       gridCol.set(qn("w:type"), "dxa")
+   ```
+
+   Combine with `table.autofit = False` and matching `cell.width` per column. Skipping the `tblGrid` step yields visually-wrong renders that pass automated checks (heading count, table count, file size) but fail visual inspection.
+
+7. **Adds running header** on pages 2 and beyond:
    ```python
    section = doc.sections[0]
    section.different_first_page_header_footer = True
@@ -125,21 +141,21 @@ Write a complete Python script that:
    # Leave section.first_page_header blank
    ```
 
-5. **Sets heading paragraph format:**
+8. **Sets heading paragraph format:**
    ```python
    heading_paragraph.paragraph_format.keep_with_next = True
    ```
 
-6. **Binds tight lists so they don't split across pages.** A list of ≤ 6 items (the "tight list" threshold) should stay together as a single block. Apply `keep_with_next` to every list item except the last, so Word treats the list as one indivisible group. Additionally, if a tight list immediately follows a paragraph that ends with a colon (a classic introducer pattern, e.g., "The MARCH algorithm steps:"), apply `keep_with_next` to that paragraph too — otherwise the lead-in can strand at the bottom of one page while its bullets continue on the next. For lists of > 6 items, allow natural pagination so a long list doesn't push half a page of white space ahead of itself.
+9. **Binds tight lists so they don't split across pages.** A list of ≤ 6 items (the "tight list" threshold) should stay together as a single block. Apply `keep_with_next` to every list item except the last, so Word treats the list as one indivisible group. Additionally, if a tight list immediately follows a paragraph that ends with a colon (a classic introducer pattern, e.g., "The MARCH algorithm steps:"), apply `keep_with_next` to that paragraph too — otherwise the lead-in can strand at the bottom of one page while its bullets continue on the next. For lists of > 6 items, allow natural pagination so a long list doesn't push half a page of white space ahead of itself.
 
-6. **Saves the file:**
-   ```python
-   output_path = "restoration_project/FINAL_DOCUMENT.docx"
-   doc.save(output_path)
-   print(f"Saved: {output_path}")
-   ```
+10. **Saves the file:**
+    ```python
+    output_path = "restoration_project/FINAL_DOCUMENT.docx"
+    doc.save(output_path)
+    print(f"Saved: {output_path}")
+    ```
 
-7. **Attempts PDF conversion.** Try, in order:
+11. **Attempts PDF conversion.** Try, in order:
 
    **macOS path (preferred when LibreOffice is absent):**
    ```applescript
@@ -175,14 +191,14 @@ Write a complete Python script that:
 
    If both fail, print: "PDF conversion not available — open the .docx in Word and use File → Save As → PDF."
 
-8. **Set `<w:updateFields w:val="true"/>` in `word/settings.xml`** so the TOC field auto-populates when the document is opened. Without this, the TOC shows "Right-click and choose Update Field to populate the Table of Contents." until the user manually refreshes.
+12. **Set `<w:updateFields w:val="true"/>` in `word/settings.xml`** so the TOC field auto-populates when the document is opened. Without this, the TOC shows "Right-click and choose Update Field to populate the Table of Contents." until the user manually refreshes.
 
-9. **Replace any plain-text TOC in the source content with a Word TOC field.** When parsing, detect the "TABLE OF CONTENTS" Heading 2 and:
-   - Render the heading itself
-   - Insert a TOC field (`TOC \o "1-3" \h \z \u`) immediately after
-   - Suppress all subsequent blocks (list items, hyphenated dot-leader lines) until the next Heading 2
+13. **Replace any plain-text TOC in the source content with a Word TOC field.** When parsing, detect the "TABLE OF CONTENTS" Heading 2 and:
+    - Render the heading itself
+    - Insert a TOC field (`TOC \o "1-3" \h \z \u`) immediately after
+    - Suppress all subsequent blocks (list items, hyphenated dot-leader lines) until the next Heading 2
 
-10. **Suppress redundant duplicates:**
+14. **Suppress redundant duplicates:**
     - The first H1 (document title) — already rendered as the cover; don't render it in the body
     - Any paragraph whose text equals the immediately-preceding heading text (e.g., `**FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION**` right after `## FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION`)
     - Cover-page subtitle/prep lines that appear in the source markdown before the first H2 (already rendered programmatically on the cover)
@@ -190,6 +206,8 @@ Write a complete Python script that:
 ---
 
 ## Step 5: Self-Verify
+
+### Automated checks (necessary but not sufficient)
 
 Run these checks after the script completes:
 
@@ -212,7 +230,25 @@ print(f"Tables: {len(doc.tables)}")
 print("Verification complete.")
 ```
 
+Also string-check that each Work-Order-mandated change is present (e.g., for the URVI doc, that `Rescue Group Supervisor (RGS):` appears in Key Definitions, that `personal protective equipment (PPE)` is defined on first use, etc.).
+
 If the file size is suspiciously small or heading count is zero, investigate and fix the parsing script before reporting completion.
+
+### Visual inspection (required — automated checks miss layout bugs)
+
+**Text-only checks do not catch layout problems.** Headings can be counted as correct while the page break falls in the wrong place. Tables can be detected as present while their borders render with gaps. This bit us during URVI restoration — the MARCH Algorithm definition rendered with its lead paragraph + first bullet on page 20 and the remaining four bullets on page 21. Every automated check passed; the doc was visually broken.
+
+After generating the PDF, **read at least these pages** and confirm they look right:
+
+1. **Cover page** — title centered, agency lines correct, version line at bottom
+2. **Page 2** — TOC begins with no header on the cover (different-first-page header is working)
+3. **The page after the TOC** — first body section starts at the top (forced page break landed correctly)
+4. **Any page containing a callout box** — box borders are unbroken on all four sides, text wraps inside the box, no right-edge gap
+5. **Any page containing a structured diagram** — sibling boxes are visibly separate (whitespace between them), connectors line up under their parents
+6. **Every page containing a definition list, checklist, or bullet group that's referenced as a single unit in the Work Order** — confirm the group is intact on one page, not split mid-list
+7. **The last page of the body** — no orphaned content; references and figures fit appropriately
+
+If a visual issue exists, do not mark assembly complete. Fix the renderer (typically `keep_with_next`, cell shading, column widths via `w:tblGrid`, or page-break placement) and regenerate before claiming success.
 
 ---
 
