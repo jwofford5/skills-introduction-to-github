@@ -59,45 +59,51 @@ Write a complete Python script that:
    - Blank line between paragraphs → paragraph break
    - `---` → page break (if preceded by a major section end) or horizontal rule
 
-2. **Applies document type styling** (from WORK_ORDER.md):
+2. **Derives styling from the document's actual context** — in this order of priority:
 
-   **Corporate / Government:**
+   1. **Layout Notes in `06_formatted.md`** (highest priority) — the Painter captured the document's real design decisions: colors, fonts, spacing, callout box specs, accent colors, special elements. These always override the baseline defaults below.
+   2. **WORK_ORDER.md** — the document type (Corporate/Government, Technical, Academic, Business/Professional) and any user-stated style preferences.
+   3. **Baseline defaults by document type** (lowest priority — use only for properties not specified above):
+
+   **Corporate / Government baseline:**
    - Font: Times New Roman, 11pt body
-   - Heading 1: Times New Roman 14pt, bold, all caps, black
-   - Heading 2: Times New Roman 12pt, bold, title case, black, horizontal rule below
-   - Heading 3: Times New Roman 11pt, bold, italic, black
+   - Heading 1: Times New Roman 14pt, bold, all caps
+   - Heading 2: Times New Roman 12pt, bold, title case, horizontal rule below
+   - Heading 3: Times New Roman 11pt, bold, italic
    - Margins: 1 inch all sides
-   - Line spacing: 1.15 or as noted in layout annotations
-   - No color except black
+   - Line spacing: 1.15
 
-   **Technical:**
+   **Technical baseline:**
    - Font: Calibri, 11pt body
-   - Heading 1: Calibri 14pt, bold, dark navy (#1F3864)
-   - Heading 2: Calibri 12pt, bold, dark navy (#1F3864)
-   - Heading 3: Calibri 11pt, bold, charcoal (#333333)
+   - Heading 1: Calibri 14pt, bold
+   - Heading 2: Calibri 12pt, bold
+   - Heading 3: Calibri 11pt, bold
    - Margins: 1 inch all sides
    - Code runs: Courier New 10pt
 
-   **Academic:**
+   **Academic baseline:**
    - Font: Times New Roman, 11pt body
-   - Heading 1: Times New Roman 14pt, bold, centered, dark navy (#1F3864) rule
-   - Heading 2: Times New Roman 12pt, bold, title case, navy horizontal rule
+   - Heading 1: Times New Roman 14pt, bold, centered
+   - Heading 2: Times New Roman 12pt, bold, title case
    - Heading 3: Times New Roman 11pt, bold, italic
    - Margins: 1 inch all sides
    - Headings: `keep_with_next = True`
 
-   **Business / Professional:**
+   **Business / Professional baseline:**
    - Font: Calibri, 11pt body
-   - Heading 1: Calibri 14pt, bold, dark navy (#1F3864)
-   - Heading 2: Calibri 12pt, bold, dark navy (#1F3864), horizontal rule
+   - Heading 1: Calibri 14pt, bold
+   - Heading 2: Calibri 12pt, bold, horizontal rule
    - Heading 3: Calibri 11pt, bold
    - Margins: 1 inch all sides
-   - List bullets: use navy bullet character (•)
+
+   > **Important:** Colors, accent schemes, callout boxes, special borders, and any other design element documented in the Layout Notes or visible in the original document are part of the document's identity — apply them faithfully. Do not strip design choices based on document type assumptions.
 
 3. **Applies layout annotations** from the Layout Notes section of `06_formatted.md`:
+   - Accent colors and color scheme (authoritative — use exactly as specified)
+   - Callout box designs (background color, border, header style)
    - Section breaks where noted
    - Table settings (row break prevention, etc.)
-   - Any special spacing or margin notes
+   - Any special spacing, margin, or element notes
    - Running header content
 
 4. **Adds running header** on pages 2 and beyond:
