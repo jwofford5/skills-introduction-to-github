@@ -289,7 +289,7 @@ Not all violent incidents unfold the same way. URVI distinguishes between dynami
 
 A dynamic incident is one in which violence is actively occurring, or the threat is mobile and unpredictable. The defining characteristic is that the attacker is actively causing harm or has the immediate capacity to do so.
 
-In dynamic incidents, the response tempo is at its highest. Phase 1 "Stop the Killing" dominates the early response. Law enforcement's priority is establishing Mobile Command and immediate engagement, with officers deploying toward the threat without delay. Mobile Command functions with the first officer on scene simultaneously fulfilling the incident command role while coordinating the rapid formation of Contact Teams to aggressively locate and neutralize the threat.
+In dynamic incidents, the response tempo is at its highest. Phase 1 "Stop the Killing" dominates the early response. Law enforcement's priority is establishing Mobile Command and immediate engagement, with officers deploying toward the threat without delay. Mobile Command functions with the first officer on scene simultaneously fulfilling the incident command role while rapidly forming up a Contact Team(s) to aggressively locate and neutralize the threat.
 
 Phase 2 "Stop the Dying" hinges on RTF deployment. However, dynamic incidents carry a heightened risk of the situation reverting to Phase 1; for example, a contained shooter may break free.
 
@@ -620,11 +620,11 @@ Even the best-trained agencies must manage the practical challenges of multi-jur
 
 ### 10.1 Managing Incoming Resources
 
-In the early phase of a critical incident, resources often arrive rapidly from across the county. The Incident Commander must manage this influx to prevent chaos. The first priority is establishing a staging area in the cold zone where incoming units report and await assignment. Without direction, uncontrolled convergence can lead to crossfire incidents, traffic gridlock, or dilution of effort. The IC will assign arriving or staged units to critical tasks: forming additional contact teams, staffing perimeter positions, securing staging areas, or preparing for RTF deployment. Effective resource management means preventing overcommitment—not every arriving officer should rush inside. Some are better used for perimeter security, traffic control, or staging management. The IC must continuously evaluate priorities and distribute personnel accordingly.
+In the early phase of a critical incident, resources often arrive rapidly from across the county. The Incident Commander must manage this influx to prevent chaos. One of the initial priorities is establishing a staging area in the cold zone where incoming units report and await assignment. Without direction, uncontrolled convergence can lead to crossfire incidents, traffic gridlock, or dilution of effort. The IC will assign arriving or staged units to critical tasks: forming additional contact teams, staffing perimeter positions, securing staging areas, or preparing for RTF deployment. Effective resource management means preventing overcommitment—not every arriving officer should rush inside. Some are better used for perimeter security, traffic control, or staging management. The IC must continuously evaluate priorities and distribute personnel accordingly.
 
 ### 10.2 Mutual Aid Integration
 
-Los Angeles County's multi-jurisdictional landscape means that significant violent incidents will draw resources from multiple agencies. Mutual aid units arriving from other jurisdictions must be seamlessly integrated into the existing Incident Command System structure. They report to staging, receive assignments from the IC, and operate under the unified plan. Pre-established mutual aid agreements and common training in ICS/NIMS principles make this integration possible.
+Los Angeles County's multi-jurisdictional landscape means that significant violent incidents will draw resources from multiple agencies and disciplines. Mutual aid units arriving from other jurisdictions must be seamlessly integrated into the existing Incident Command System structure. They report to staging, receive assignments from the IC, and operate under the unified plan. Pre-established mutual aid agreements and common training in ICS/NIMS principles make this integration possible.
 
 Mutual aid personnel should receive a quick briefing upon arrival covering: incident status, current command structure, radio channels in use, and their specific assignment. The goal is to get them operational quickly without disrupting the existing organization. A staging area manager logs all arriving mutual aid units and their capabilities.
 
@@ -725,6 +725,13 @@ For the full definitions of key terms used throughout this framework, refer to t
 **Hot Zone:** The area of active or suspected threat where only law enforcement operates. Fire/EMS do not enter.
 
 **Incident Command System (ICS):** A standardized, scalable organizational structure for managing incidents, providing clear chain of command and modular functions.
+
+**MARCH Algorithm:** The MARCH algorithm prioritizes care for injuries based on severity to prevent rapid fatality. Used primarily during the "Indirect Threat Care" (warm zone) phase of TECC. The MARCH algorithm steps:
+- M — Massive Hemorrhage: control bleeding with tourniquets or wound packing.
+- A — Airway: establish and maintain an open airway.
+- R — Respiration: treat penetrating chest wounds with chest seals to prevent tension pneumothorax.
+- C — Circulation: manage shock and reassess previous interventions.
+- H — Hypothermia: prevent hypothermia and manage head injuries.
 
 **Mobile Command:** The practice of the first arriving officer serving as incident commander while still engaged in the unfolding incident, prior to establishing a fixed command post.
 
