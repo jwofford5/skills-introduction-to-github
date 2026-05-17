@@ -220,3 +220,26 @@ Action required: Re-run /[skill-name] — [what it needs to fix]
 
 See restoration_project/PM_REPORT.md for full details.
 ```
+
+---
+
+## Handling Post-Audit Reviewer Edits
+
+The pipeline officially ends at `/doc-assemble` once the PM audit issues APPROVED (or APPROVED WITH NOTES). In practice, however, a published document often comes back with **post-PM reviewer feedback** — annotations on a circulated PDF, change requests from an SME, last-minute wording tweaks. The pipeline has no formal "step 11" for this, so follow this convention:
+
+1. **Edit `07_polished.md` directly.** This is the canonical content source the assembly step reads from. Do NOT modify `01_inspection.md` through `06_formatted.md` — those are frozen snapshots of pipeline state and should remain intact for the historical record.
+
+2. **Do NOT modify `PM_REPORT.md`.** That report is a snapshot of the audit decision at a specific point in time. Subsequent reviewer edits are tracked in git commit messages, not by retroactively editing the audit.
+
+3. **Re-run `/doc-assemble` only** — the upstream skills don't need to re-execute. The assembly step regenerates `FINAL_DOCUMENT.docx` and `FINAL_DOCUMENT.pdf` from the edited `07_polished.md`.
+
+4. **Commit on a new branch** (e.g., `reviewer-followup-edits`, `legal-review-changes`) and open a PR rather than committing directly to `main`. The branch name and PR title should describe the source of the feedback (which reviewer, what review pass) so future readers can reconstruct the chain of revisions.
+
+5. **In the PR description, distinguish three classes of feedback:**
+   - **Explicit edits** the reviewer wrote out verbatim — apply as written
+   - **Ambiguous comments** where the reviewer's intent isn't clear — make a judgment call and document the reasoning, OR pass through to the user/SME
+   - **Already-applied comments** (the reviewer flagged something that was fixed in an earlier pipeline step) — note in the PR for completeness; no action needed
+
+6. **For each edit, verify in the regenerated docx** that the new wording is present and the old wording is absent. Visual inspection of the relevant page in the PDF is also required for any change near page breaks, callout boxes, or definition lists (see doc-assemble Step 5 — Self-Verify).
+
+This pattern keeps the pipeline outputs immutable as a historical record while allowing the document to evolve through review cycles. If the changes are large enough that they meaningfully invalidate the PM audit (e.g., reviewer flags substantive content gaps), do not patch via this workflow — re-run `/doc-audit` to issue a fresh decision.

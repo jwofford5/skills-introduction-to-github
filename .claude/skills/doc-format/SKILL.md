@@ -104,12 +104,30 @@ Apply these across all document types:
 Add a `<!-- layout: ... -->` annotation for every page-level layout decision that cannot be expressed in markdown but should be applied when the Word document is generated:
 
 ```
-<!-- layout: this section should start on a new page (major section break) -->
 <!-- layout: recommended 1.5" left margin for binding -->
 <!-- layout: Table 1 should be set to "allow row to break across pages: false" -->
-<!-- layout: this callout paragraph should be formatted as a shaded text box in Word -->
 <!-- layout: running header should include: "[Document Title] | [Section Name]" -->
 ```
+
+### Page break guidance — read this carefully
+
+**Do not mandate a page break before every major section.** Forced page-break-before on every Heading 2 in a doctrinal or reference document strands the bottom of pages whenever a section is short, producing large blank gaps that look unfinished. The Word document's natural pagination, combined with `keep_with_next` on heading paragraphs (handled by `doc-assemble`), produces a tighter and more professional layout.
+
+Reserve forced page breaks for **front-matter transitions only**:
+- After the cover page
+- (Sometimes) Before the first numbered section if the table of contents is very short and you want body content to start fresh
+
+For section visual separation, rely on the heading style itself (size, bold, color, horizontal rule below) rather than a page break. If a specific section *must* start on its own page (e.g., a multi-page checklist annex), use:
+
+```
+<!-- layout: section [N] must start on a new page — [reason: e.g., annex / standalone reference / regulatory requirement] -->
+```
+
+Use this sparingly.
+
+### Callout boxes
+
+For shaded side panels, definition boxes, or any visual block the source renders with a colored header and shaded body, **do not** annotate them as "shaded paragraph" or rely on paragraph borders. Specify the Word table form (see doc-visuals callout box assembly spec). Render decisions belong in the assembly step; this step's job is to identify and tag the block.
 
 ---
 
