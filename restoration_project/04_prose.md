@@ -1,758 +1,321 @@
-# Unified Response to Violent Incidents (URVI)
+# Emotional Intelligence
 
-<!-- STRUCTURE CHANGES LOG
-Changes made by doc-structure (Step 3):
-
-1. REMOVED DUPLICATE CONTENT: Section 4.2 (Operational Zone Definitions)
-   - The original document contained the Hot Zone / Warm Zone / Cold Zone definitions
-     twice in immediate succession: first in a callout box, then again as highlighted
-     bullet points below the callout box.
-   - The callout box version has been retained as the authoritative definition.
-   - The duplicate bullet points have been removed.
-   - IMPORTANT: The Warm Zone bullet contained one additional sentence not present in
-     the callout box: "If security changes, the zone instantly becomes hot and RTFs
-     withdraw." This operationally important detail has been added to the Warm Zone
-     definition inside the callout box so it is not lost.
-   - The paragraph that followed the bullets ("Personnel must stay in their assigned
-     zones at all times...") has been retained in its original position.
-
-2. STANDARDIZED SECTION NUMBERING: Section 1 subsections
-   - The TOC used "1A. Preamble" with a letter suffix while all other subsections use
-     decimal notation (1.1, 1.2, 1.3, etc.). This was the only instance of letter-based
-     subsection notation in the entire document.
-   - Changed: "1A. Preamble" → "1.1 Preamble" throughout (TOC and body heading).
-   - All other section numbers are unchanged.
-
-3. HEADING HIERARCHY APPLIED: Consistent markdown heading levels
-   - H1 (#): Document title only
-   - H2 (##): 13 major numbered sections
-   - H3 (###): Subsections (1.1 through 13.x)
-   - H4 (####): Sub-subsections (Law Enforcement Priorities, Solo Officer Engagement, etc.)
-   - Body headings in the original PDF did not consistently show section numbers;
-     the heading level hierarchy is applied here for structural clarity.
-
-4. SECTION ORDER: Unchanged — the original section order is logical and appropriate
-   for a government operational framework document.
-
-5. PROTECTED SECTIONS: None specified.
-
-NOTE: [HIGHLIGHTED: text] markers throughout this document indicate passages that were
-visually highlighted in the source PDF. These are NOT structural issues — they are
-preserved here as-is and will be addressed by doc-prose (Step 5) and doc-format (Step 7).
--->
-
-<!-- FLOW CHANGES LOG
-Changes made by doc-flow (Step 4):
-- Added 11 section lead-out transitions (one at the close of each major numbered section)
-- Added 0 intra-section paragraph bridges (existing paragraph flow within sections is adequate)
-- Protected sections (unchanged): None specified
-- Tone preserved: operational/instructional throughout; no prose altered
--->
-
-<!-- PROSE CHANGES LOG
-Changes made by doc-prose (Step 5):
-Mode: FLAG-AND-CONFIRM
-
-Summary:
-  Grammar corrections: 0
-  Passive→active voice: 0
-  Tone improvements: 0
-  Filler removed: 0
-  Terminology consolidated: 2 (medics → fire/EMS personnel)
-  Punctuation corrected: 2 (em-dash; abbreviation style)
-  Changes approved by user: 4 / 5 proposed
-  Changes rejected by user: 1 (M.A.R. reference in 4.2.4 — retained as intentional tactical emphasis)
-
-Protected sections (unchanged): None specified
-Facts/names/dates: NOT modified
+<!-- PROSE LOG (AUTO MODE) — Changes applied:
+1. Introduction, ¶1: "one of the most generative and contested" → "among the most generative and contested" (avoids superlative overclaim)
+2. Introduction, ¶3: "one that is empirically distinguishable from general intelligence and personality" → added comma after "personality" for clarity before the subordinate clause
+3. Conceptual Foundations §Historical Precursors, ¶2: "The necessary synthesis came in 1990." — retained as stylistically effective; no change
+4. Salovey & Mayer §, ¶2: "This distinction matters." — retained as deliberate rhetorical emphasis; no change
+5. Theoretical Models §Comparative Analysis: "Scholars have increasingly argued" → "A growing body of scholarship contends" (more formal register)
+6. Neuroscience §Neural Architecture, ¶1: "plays a central role in detecting" → retained; active and precise
+7. Neuroscience §Neural Architecture, ¶2: "though this formulation has been critiqued as an oversimplification" → "though this formulation has been criticized as an oversimplification" (critiqued → criticized; more standard academic register)
+8. Measurement §Ability-Based, ¶2: "the test may not capture a pure cognitive ability so much as conformity" → "the test may measure not a pure cognitive ability but rather conformity" (clearer contrast construction)
+9. Empirical Evidence §Academic, ¶1: "Proposed mechanisms include" — retained; appropriately hedged
+10. Empirical Evidence §Workplace, ¶2: "EI has also been linked to" → "EI has further been associated with" (avoids repetition of "linked" from earlier paragraph)
+11. Critiques §Construct Validity: "raising the question of whether such measures capture anything that established personality inventories do not" → "raising the question of whether such measures capture variance not already explained by established personality inventories" (more technically precise)
+12. Critiques §Publication Bias: "the field's practical claims … substantially exceed what the controlled evidence supports" → retained; appropriately pointed
+13. Implications §Organizational: "though methodological limitations … temper conclusions about efficacy" → retained; appropriately hedged
+14. Conclusion ¶3: "What the evidence does not support is dismissal." — retained as deliberate rhetorical close; no change
 -->
 
 ---
 
-*Framework for Los Angeles County Operational Guidelines*
-Prepared by the URVI Guidelines Committee
-Los Angeles County Public Safety Agencies
+## Abstract
+
+Emotional intelligence (EI) has emerged as one of the most studied and debated constructs in contemporary psychology. This paper reviews the scientific foundations of EI, tracing its conceptual origins from early theories of social and multiple intelligences through the formal ability-based model introduced by Salovey and Mayer (1990) and its subsequent theoretical elaborations. Three dominant models — the ability model, the mixed model, and the trait model — are examined with respect to their theoretical architecture, measurement approaches, and psychometric properties. The neurological and biological bases of emotional processing are reviewed, drawing on evidence from cognitive neuroscience and behavioral genetics. Meta-analytic findings linking EI to outcomes across academic, occupational, mental health, interpersonal, and health behavior domains are synthesized and critically evaluated. Persistent critiques concerning construct validity, measurement fragmentation, publication bias, and cultural generalizability are addressed alongside scholarly responses. The paper concludes that ability-based EI represents a scientifically defensible construct with meaningful, if modest, predictive utility — and that the field's central challenge is theoretical consolidation rather than empirical relevance.
+
+*Keywords:* emotional intelligence, ability model, trait emotional intelligence, emotion regulation, psychometrics, meta-analysis
 
 ---
 
-## TABLE OF CONTENTS
+# Emotional Intelligence
 
-1. EXECUTIVE SUMMARY — 3
-   - 1.1 Preamble — 3
-   - 1.2 Vision and Objectives — 3
-   - 1.3 Target Audience — 3
-   - 1.4 The Los Angeles County Operational Environment — 3
-   - 1.5 Alignment with National Doctrine — 4
-   - 1.6 Scope of Covered Incidents — 4
-   - 1.7 Consequences of Breaking from Doctrine — 4
+## Introduction
 
-2. NATIONAL DOCTRINE FOUNDATION — 4
-   - 2.1 Core NIMS Principles — 4
-   - 2.2 NFPA 3000 as a Guiding Standard — 4
+The study of emotional intelligence (EI) has been among the most generative and contested developments in twentieth-century psychology. Since its formal introduction by Salovey and Mayer (1990), EI has attracted sustained scientific inquiry, spawned competing theoretical frameworks, and generated a substantial empirical literature examining its role in cognition, interpersonal functioning, occupational performance, and mental health. At the same time, the construct has provoked significant scholarly debate concerning its boundaries, its distinctiveness from established psychological constructs, and the validity of its measurement instruments.
 
-3. INCIDENT TYPES: DYNAMIC VS. STATIC SCENARIOS — 5
-   - 3.1 Dynamic Incidents — 5
-   - 3.2 Static or Contained Incidents — 5
-   - 3.3 Transitioning Between Types — 5
+This paper examines the scientific foundations of emotional intelligence. It traces the construct's conceptual origins, surveys the three dominant theoretical models, reviews the neurological and biological evidence base, evaluates major measurement approaches and their psychometric properties, and synthesizes empirical findings across five outcome domains. The paper concludes with a discussion of persistent critiques and the implications of EI research for education, clinical practice, and organizational development.
 
-4. THREE-PHASE RESPONSE MODEL — 5
-   - 4.1 Phase 1 – Stop the Killing — 6
-   - 4.1.1 Law Enforcement Priorities — 6
-   - 4.1.2 Solo Officer Engagement — 6
-   - 4.1.3 Contact Team Deployment — 6
-   - 4.1.4 Maintaining Command During Tactical Entry — 6
-   - 4.1.5 Supervisor Responsibilities — 7
-   - 4.2 Phase 2 – Stop the Dying — 7
-   - 4.2.1 Considerations for RTF Deployment — 7
-   - 4.2.2 Operational Zone Definitions — 7
-   - 4.2.3 RTF Functions — 7
-   - 4.2.4 Tactical Emergency Medical Priorities — 8
-   - 4.2.5 Coordinating Medical and Security Operations — 8
-   - 4.3 Phase 3 – Recovery and Transition — 8
-   - 4.3.1 Command Priorities — 8
-
-5. COMMAND PROCEDURES — 9
-   - 5.1 First Officer on Scene — 9
-   - 5.1.1 Responsibilities — 9
-   - 5.1.2 Initial Radio Communication — 9
-   - 5.2 Mobile Command — 9
-   - 5.3 Role of Second Supervisor — 9
-   - 5.4 Transfer of Command — 9
-   - 5.5 Transition from Mobile to Fixed Command Post — 10
-
-6. UNIFIED COMMAND — 10
-   - 6.1 Purpose and Importance — 10
-   - 6.2 Triggers for Formation — 10
-   - 6.3 Unified Command Responsibilities — 10
-   - 6.4 Command Post Setup — 10
-   - 6.5 Communication Protocols — 10
-   - 6.6 Preventing Conflict in Multi-Agency Command — 11
-
-7. RESCUE TASK FORCES (RTFS) — 11
-   - 7.1 Definition and Composition — 11
-   - 7.2 RTF Formation — 11
-   - 7.3 Roles Within the RTF — 11
-   - 7.4 Deployment Triggers and Priorities — 11
-   - 7.5 Operational Cohesion — 12
-   - 7.6 RTF-to-Command Communication — 12
-   - 7.7 Withdrawal Criteria — 12
-   - 7.8 Multiple RTF Oversight — 12
-
-8. COMMUNICATIONS AND INTEROPERABILITY — 12
-   - 8.1 Communications Principles — 12
-   - 8.2 Radio Channel Architecture — 12
-   - 8.3 Not All Agencies Can Communicate Directly — 12
-   - 8.4 Information Flow During Operations — 13
-   - 8.5 Subsequent Control Measures — 13
-
-9. TRAINING AND PREPAREDNESS — 13
-   - 9.1 Joint Training Imperative — 13
-   - 9.2 Training for Phase 2 Operations — 13
-   - 9.3 First-On-Scene Leadership Training — 13
-   - 9.4 Pre-Incident Planning — 14
-   - 9.5 Empowerment and Support — 14
-   - 9.6 Sample Size-Up Components — 14
-
-10. MUTUAL AID AND RESOURCE MANAGEMENT — 14
-    - 10.1 Managing Incoming Resources — 14
-    - 10.2 Mutual Aid Integration — 15
-    - 10.3 Resource Tracking — 15
-    - 10.4 Preventing Freelancing/Self-deployment and Overlap — 15
-
-11. OPERATIONAL QUICK-REFERENCE — 15
-    - 11.1 First Officer on Scene Checklist — 15
-    - 11.2 Supervisor Arrival Checklist — 15
-    - 11.3 Unified Command Formation Checklist — 16
-    - 11.4 RTF Deployment Checklist — 16
-    - 11.5 Phase Transition Decision Points — 16
-
-12. KEY DEFINITIONS — 16
-13. REFERENCES — 18
-
----
-
-## 1. EXECUTIVE SUMMARY
-
-The Unified Response to Violent Incidents (URVI) framework establishes a coordinated, multi-agency approach for Los Angeles County's response to active violence emergencies. URVI ensures that law enforcement, fire services, and emergency medical services (EMS) operate as a single cohesive force from the first moments of a crisis through recovery initiation.
-
-This framework is a recommended guideline for all Los Angeles County public safety agencies. It does not supersede individual agency policies on use of force, tactical decisions, or specific departmental procedures. Instead, it provides the coordination architecture that enables agencies to work together effectively when violence strikes.
-
-### 1.1 Preamble
-
-<!-- structure: renamed from "1A. Preamble" to "1.1 Preamble" to match decimal subsection notation used throughout the rest of the document -->
-
-The leader's intent of the URVI Framework is to support immediate, coordinated action during violent incidents. The framework is designed to help law enforcement, fire, and EMS resources operate from the earliest moments of a crisis with shared objectives: establish command, stop the threat, protect life, and begin lifesaving rescue operations as soon as conditions allow.
-
-Responders should establish command immediately, including when operating in a mobile capacity, and transition to Unified Command as early as conditions and resources allow. Unified Command, common terminology, and coordinated communications remain essential to URVI operations; however, the absence of ideal coordination should not delay action when lives are at risk.
-
-Cross-discipline integration is essential, but engagement should not be paused due to lack of staffing on either side. Responders should not delay downrange engagement because integration requirements have not been fully met. The imperative to save lives overrides the ideal of perfect coordination. Responders should adapt, act with available resources, and continue building coordination as the incident evolves.
-
-This framework supports action over inaction, disciplined initiative, and coordinated decision-making while preserving responder safety and each agency's policies, authorities, and responsibilities.
-
-### 1.2 Vision and Objectives
-
-URVI envisions every violent emergency in Los Angeles County met with a seamless, collaborative response—no silos, no fragmented efforts, only a unified front focused on neutralizing threats and saving lives. The framework establishes five core objectives:
-
-- **Establish Command from the Outset:** Establish Mobile Command upon arrival and transition to Unified Command as early as possible so all agencies share leadership and common objectives from the start.
-- **Rapid Threat Neutralization:** Empower first responders to take immediate action to stop the threat, shortening the duration of violence.
-- **Swift Victim Care and Evacuation:** Deploy integrated Rescue Task Forces (RTFs) quickly into cleared areas to treat and evacuate injured victims.
-- **Interoperable Communication:** Use common terminology, interoperable radios, and coordinated tactics across all agencies.
-- **Continuous Joint Preparedness:** Conduct regular multi-agency training and exercises to build interagency trust and operational readiness.
-
-### 1.3 Target Audience
-
-This document is intended for the entire Los Angeles County public safety community: law enforcement officers, firefighters, paramedics, EMTs, incident commanders, field supervisors, and dispatch centers. Personnel involved in planning, leading, or participating in the response to violent incidents are part of the target audience.
-
-### 1.4 The Los Angeles County Operational Environment
-
-Los Angeles County's public safety landscape demands a tailored approach to unified response. The county spans a population of over 10 million people and includes dozens of separate police and fire agencies. This patchwork of jurisdictions means that any significant violent incident will likely draw responders from multiple organizations with distinct protocols, radio systems, and command structures.
-
-A pursuit or active shooter can easily cross city boundaries, requiring instant cooperation between municipal police, county deputies, and various fire/EMS teams. Los Angeles also hosts large-scale events that involve unified planning among police, fire, EMS, and federal partners. The region's dense urban landscape introduces additional complexity: high-rise buildings, heavy traffic, large crowds, and sprawling venues all shape how perimeters are established, how zones are managed, and how resources are repositioned.
-
-### 1.5 Alignment with National Doctrine
-
-URVI is grounded in FIRESCOPE 701, the National Incident Management System (NIMS) and the Incident Command System (ICS), ensuring all roles, terminology, and structures are nationally standardized. URVI operationalizes national doctrine for the specific realities of Los Angeles County.
-
-### 1.6 Scope of Covered Incidents
-
-The framework covers violent incident types requiring unified response, including active assailant attacks (for example, shooters, mass stabbings, and vehicle rammings), mass casualty terrorist attacks (including bombings and coordinated attacks), civil unrest and riots involving violence, armed barricades, and hostage situations. This list is not all-inclusive, and there may be other violent incidents requiring force protection escorts by law enforcement. Purely accidental events or natural disasters are outside the scope unless compounded by deliberate violent acts.
-
-### 1.7 Consequences of Breaking from Doctrine
-
-Straying from ICS, NIMS, or Unified Command during a high-risk violent incident can have severe consequences. Without unified command, agencies may pursue conflicting objectives, critical information may be missed, and responders may be placed in unnecessary danger. Lack of accountability leads to freelancing, overlapping efforts, and areas of the incident left unchecked. A fractured command structure wastes precious time and directly translates to slower threat neutralization and delayed victim treatment. Adherence to doctrine is essential.
+The central argument advanced here is that EI, most rigorously operationalized as an ability construct, represents a scientifically defensible and practically meaningful dimension of human psychological functioning — one that is empirically distinguishable from general intelligence and personality, though characterized by effect sizes that demand measured interpretation.
 
 <!-- flow: added section lead-out -->
-The following section identifies the specific national standards—NIMS, ICS, and NFPA 3000—that form the doctrinal foundation upon which URVI is built.
+Understanding what emotional intelligence is requires first examining the conceptual territory from which it emerged — and the theoretical disagreements that have shaped its development.
 
 ---
 
-## 2. NATIONAL DOCTRINE FOUNDATION
+## Conceptual Foundations: Defining Emotional Intelligence
 
-### 2.1 Core NIMS Principles
+### Historical Precursors
 
-Several NIMS concepts are especially relevant for URVI response:
+The idea that emotion and cognition are not wholly separable capacities has deep roots in psychological theory. Thorndike (1920) introduced the concept of social intelligence — the ability to understand and manage people — as a dimension of human competence distinct from abstract reasoning. Gardner (1983) extended this lineage in his theory of multiple intelligences, proposing interpersonal intelligence (understanding others) and intrapersonal intelligence (understanding oneself) as discrete cognitive capacities alongside linguistic, logical-mathematical, and spatial intelligences.
 
-- **Common Terminology:** All responders use plain language and shared definitions for key terms. No agency-specific codes during URVI events.
-- **Unified Command:** When multiple agencies are involved, leaders form one team to set objectives and priorities together.
-- **Chain of Command and Unity of Command:** Every responder knows exactly who they report to under the incident organization.
-- **Manageable Span of Control:** No supervisor oversees more than five to seven individuals or teams, ensuring effective monitoring under high stress.
-- **Incident Action Planning:** Even during rapidly evolving events, establishing incident objectives ensures all agencies operate toward common goals.
+These frameworks established the intellectual preconditions for a formal theory of emotional intelligence but did not provide one. The necessary synthesis came in 1990.
 
-### 2.2 NFPA 3000 as a Guiding Standard
+### The Salovey and Mayer Definition
 
-NFPA 3000 provides validated strategies for active shooter and hostile event response. Key tenets incorporated into URVI include Unified Command as a non-negotiable practice, integrated Rescue Task Forces entering warm zones under law enforcement protection, common operational language and compatible radio channels, and regular joint training exercises. By following NFPA 3000 guidance, URVI ensures Los Angeles County's practices meet nationally recognized benchmarks.
+Salovey and Mayer (1990) offered the first systematic academic definition of emotional intelligence, describing it as "the ability to monitor one's own and others' feelings and emotions, to discriminate among them, and to use this information to guide one's thinking and actions" (p. 189). This formulation positioned EI as a cognitive ability — a form of intelligence in the technical psychometric sense — rather than a personality disposition or behavioral style.
+
+This distinction matters. Treating EI as an ability subjects it to the same standards of validity applied to general cognitive ability: it must be measurable through performance, it must show convergent and discriminant validity, and it must predict outcomes beyond what personality and IQ already explain.
+
+### Conceptual Boundaries
+
+Three broad conceptualizations have emerged in the literature, reflecting different answers to the question of what emotional intelligence is:
+
+1. **Ability EI:** A set of emotion-related cognitive skills, measurable by performance-based tests
+2. **Trait EI:** A constellation of emotion-related self-perceptions, measured by self-report and treated as a personality construct
+3. **Mixed EI:** A broad amalgam of emotional skills, personality traits, motivational factors, and social competencies
+
+Each conceptualization has generated its own theoretical model, assessment instruments, and empirical literature — and its own critical reception.
 
 <!-- flow: added section lead-out -->
-With this doctrinal foundation established, the framework next addresses how violent incidents are categorized—a distinction that directly shapes operational tempo, RTF deployment timing, and tactical approach.
+These three conceptualizations have given rise to distinct theoretical models, each with its own architecture, measurement tools, and scholarly standing — a divergence that lies at the heart of ongoing debates in the field.
 
 ---
 
-## 3. INCIDENT TYPES: DYNAMIC VS. STATIC SCENARIOS
+## Theoretical Models of Emotional Intelligence
 
-Not all violent incidents unfold the same way. URVI distinguishes between dynamic and static (or contained) scenarios because the operational tempo, phase transitions, RTF deployment, and tactical approach differ significantly between them. Recognizing static versus dynamic incidents is a critical skill for incident commanders.
+### The Ability Model
 
-### 3.1 Dynamic Incidents
+Mayer, Salovey, and Caruso (2004) refined the original definition into a hierarchical four-branch model, organized from more basic to more complex emotional processing:
 
-A dynamic incident is one in which violence is actively occurring, or the threat is mobile and unpredictable. The defining characteristic is that the attacker is actively causing harm or has the immediate capacity to do so.
+1. **Perceiving emotions:** Accurately reading emotional signals in faces, voices, images, and other stimuli
+2. **Using emotions to facilitate thought:** Harnessing emotional states to prioritize attention and enhance cognitive performance appropriate to the task
+3. **Understanding emotions:** Comprehending the vocabulary of emotion, the causes and consequences of emotional states, and how emotions blend and evolve over time
+4. **Managing emotions:** Regulating one's own emotions and influencing the emotional states of others in service of goals
 
-In dynamic incidents, the response tempo is at its highest. Phase 1 "Stop the Killing" dominates the early response. Law enforcement's priority is establishing Mobile Command and immediate engagement, with officers deploying toward the threat without delay. Mobile Command functions with the first officer on scene simultaneously fulfilling the incident command role while **[HIGHLIGHTED: coordinating]** the rapid formation of Contact Teams to aggressively locate and neutralize the threat.
+The ability model is operationalized primarily through the Mayer-Salovey-Caruso Emotional Intelligence Test (MSCEIT), a performance-based measure in which correct answers are determined by consensus norms or expert ratings rather than by self-report. This approach aligns the measurement of EI with how other intelligence constructs are assessed and is widely regarded as the most psychometrically rigorous formulation of EI (Mayer et al., 2008).
 
-Phase 2 "Stop the Dying" hinges on RTF deployment. However, dynamic incidents carry a heightened risk of the situation reverting to Phase 1; for example, a contained shooter may break free.
+### The Mixed Model
 
-**[HIGHLIGHTED PARAGRAPH: Key operational considerations for dynamic incidents include solo officer engagement, which may be necessary before backup arrives]**; RTF deployment should begin as soon as any portion of the scene becomes a viable warm zone rather than waiting for full scene clearance. Communication must be continuous and concise given the fast-changing conditions. Unified Command formation occurs in parallel with tactical operations rather than sequentially.
+Goleman (1995) introduced EI to a mass audience through his influential book, which synthesized Salovey and Mayer's original work with neuroscience, organizational research, and developmental psychology. His model identifies five components: self-awareness, self-regulation, motivation, empathy, and social skills. In subsequent organizational applications (Boyatzis et al., 2000), these components were elaborated into competency clusters assessed through 360-degree multi-rater instruments.
 
-### 3.2 Static or Contained Incidents
+The mixed model has generated substantial practitioner adoption and organizational investment. However, it has attracted criticism from psychometricians for conflating emotional ability with personality traits, motivational dispositions, and social skills — constructs with established homes in existing psychological taxonomies. Locke (2005) argued that Goleman's formulation is not a form of intelligence at all but rather a miscellany of traits rebranded under an appealing label.
 
-A static or contained incident is one where the threat is present but not actively causing harm.
+### The Trait Model
 
-In static incidents, the operational tempo is more deliberate. While Phase 1 principles still apply, the approach shifts from aggressive rapid deployment to containment, negotiation, and planned tactical intervention.
+Petrides and Furnham (2001) proposed that the confusion in the EI literature could be resolved by drawing a principled distinction between ability EI (measured by performance tests) and trait EI (measured by self-report). Their Trait Emotional Intelligence Questionnaire (TEIQue) positions EI explicitly as a personality construct located in the lower levels of the personality hierarchy. By making this ontological commitment transparent, the trait model avoids the charge of conflating self-perceived competence with actual competence.
 
-### 3.3 Transitioning Between Types
+Research using the TEIQue has demonstrated meaningful associations between trait EI and outcomes including life satisfaction, academic performance, and organizational behavior (Petrides et al., 2007), though the distinctiveness of these findings from well-established personality constructs such as the Big Five remains an active area of inquiry.
 
-Incidents can shift between dynamic and static at any point. Incident commanders must continuously assess the nature of the threat and adjust the operational tempo accordingly. URVI's integrated command structure, common terminology, and pre-planned procedures ensure that these transitions can be managed smoothly without losing coordination between agencies.
+### Comparative Analysis
+
+The three models differ fundamentally on three dimensions: (a) what EI is claimed to be (ability vs. trait vs. mixed construct), (b) how it is measured (performance vs. self-report vs. multi-rater), and (c) what predictive validity it is expected to demonstrate. These differences complicate cross-study comparisons and meta-analytic aggregation, since measures drawn from different models often show low intercorrelations (Joseph & Newman, 2010). A growing body of scholarship contends that the field requires greater theoretical consolidation before robust conclusions about EI's predictive utility can be drawn.
 
 <!-- flow: added section lead-out -->
-The three-phase response model described in the following section provides the operational structure that applies across both incident types, enabling smooth transitions regardless of how a scenario begins or evolves.
+Beyond the theoretical architecture of these models, a parallel scientific program has examined the neurological and biological mechanisms that underlie individual differences in emotional processing — providing a biological grounding for the construct's legitimacy.
 
 ---
 
-## 4. THREE-PHASE RESPONSE MODEL
+## Neurological and Biological Bases of Emotional Intelligence
 
-The URVI guidelines organize the response to violent incidents into three distinct phases.
+### Neural Architecture of Emotion
 
-> **THE THREE-PHASE RESPONSE MODEL**
-> **Phase 1 – Stop the Killing:** Law enforcement immediately engages to neutralize the threat. Speed and direct action are prioritized.
-> **Phase 2 – Stop the Dying:** Integrated Rescue Task Forces deploy into warm zones to treat and evacuate injured victims.
-> **Phase 3 – Recovery and Transition:** Scene secured, all critical victims addressed, shift to recovery and investigation.
+The neuroscience of emotion provides an important foundation for understanding why emotion-related capacities vary across individuals and why they matter for cognition and behavior. The amygdala — a bilateral subcortical structure in the medial temporal lobe — plays a central role in detecting emotionally salient stimuli, particularly threats, and initiating rapid affective responses. The prefrontal cortex (PFC), especially its ventromedial and dorsolateral subdivisions, is implicated in emotional regulation, impulse control, working memory, and executive decision-making.
 
-Each phase has clear priorities and transitions based on conditions, not time. Phases may overlap, and responders must be prepared to revert to an earlier phase if conditions change.
+LeDoux (1996) described two pathways by which emotional stimuli are processed: a fast subcortical route through the thalamus to the amygdala (enabling rapid, pre-conscious emotional responses) and a slower cortical route that allows deliberate appraisal and regulatory response. Goleman (1995) popularized the concept of the "amygdala hijack" — a situation in which the fast pathway triggers an emotional response that temporarily overrides rational cortical processing — though this formulation has been criticized as an oversimplification of more complex circuit dynamics.
 
-### 4.1 Phase 1 – Stop the Killing
+### The Somatic Marker Hypothesis
 
-Phase 1 begins the moment a violent incident is recognized. The overriding mission is preventing further loss of life from the aggressor. Law enforcement officers immediately move to engage or contain the suspect. Fire and EMS resources stage in a safe area and prepare to activate rescue operations.
+Damasio (1994) advanced the somatic marker hypothesis, arguing that emotions are not obstacles to rational decision-making but essential inputs to it. Patients with damage to the ventromedial PFC, he observed, showed intact general intelligence but severely impaired real-world judgment — due, Damasio argued, to the disruption of somatic markers, emotional signals that guide decision-making under uncertainty. This work provided a neurological rationale for the claim that emotional processing capacities contribute meaningfully to adaptive functioning.
 
-#### Law Enforcement Priorities
+### Neuroplasticity and Development
 
-- **Establish Command and Rapidly Deploy to the Threat:** Officers deploy immediately to confront the suspect. Speed and direct action are prioritized to make contact with the threat as quickly as possible.
-- **Neutralize and/or Isolate the Threat(s):** Use necessary force to stop the threat or work to isolate and contain the suspect to deny access to additional victims.
-- **Protect Life:** Direct able-bodied individuals to evacuate or shelter in place as law enforcement moves to engage the threat.
-- **Communicate Critical Information:** Relay suspect description, location, weapons, number of assailants, and additional assignments to dispatch and incoming units.
-- **Establish Initial Perimeter:** Contain the incident geographically to prevent suspect escape and channel individuals away from danger.
+Evidence for neuroplasticity — the brain's capacity to reorganize in response to experience — supports the view that EI-related abilities are not fixed at birth but can be developed across the lifespan. Regions implicated in emotion regulation, including the PFC and anterior cingulate cortex, show experience-dependent structural and functional changes (Davidson et al., 2000). This finding has implications for intervention design and for the claim that EI can be trained.
 
-#### Solo Officer Engagement
+### Biological Contributions
 
-The first officer on scene must act without delay if lives are at risk, even without backup. Solo engagement is warranted when there is active gunfire or assault in progress, an immediate threat to multiple victims, and no other units are immediately available. Solo officers establish Mobile Command and move toward the threat, broadcasting their location and actions to incoming units. Solo engagement is a stopgap until reinforcements arrive.
-
-#### Contact Team Deployment
-
-As additional officers arrive, they organize into contact teams of two to four officers who move together in coordinated tactical formation. The team lead guides movement toward the threat. Contact teams move dynamically, bypassing rooms to reach and neutralize the active threat quickly. Once the suspect is stopped, contact teams may pivot to searching for additional threats and directing Rescue Teams to victim locations.
-
-#### Maintaining Command During Tactical Entry
-
-Tactical urgency must not eclipse command and control. Once a field supervisor arrives, that supervisor should assume command rather than joining the entry team. The supervisor establishes a command post, organizes additional arriving units, manages communications, and coordinates with incoming agencies. Not every law enforcement officer should self-deploy into the building; the Incident Commander exercises discipline over responding units, directing them to perimeter, staging, or specific tactical assignments.
-
-#### Supervisor Responsibilities
-
-- **Establish Command and an Incident Command Post (ICP):** Assume the incident commander role and announce it over radio.
-- **Request Additional Resources Early:** Additional field personnel, Fire/EMS, mutual aid, and Specialized Units.
-- **Designate Staging Areas and Perimeters:** Direct incoming responders to a staging area away from the hot zone. Establish inner and outer perimeters. Keep emergency response vehicle access routes open.
-- **Integrate Fire/EMS as They Arrive:** Physically meet the ranking fire officer, share situation updates, and form Unified Command.
-- **Maintain Personnel Accountability:** Utilize departmental tools to track all assigned and staged incident resources.
-
-### 4.2 Phase 2 – Stop the Dying
-
-With the threat neutralized or contained, Phase 2 focuses on rapid medical intervention. Integrated police-fire/EMS Rescue Task Forces deploy into warm zones to treat injured victims using the MARCH (Massive Hemorrhage, Airway, Respiration, Circulation, Hypothermia/Head Injury) algorithm and evacuate them to safety. This phase represents a fundamental shift from the old paradigm of holding EMS back until scenes were fully cleared.
-
-#### Considerations for RTF Deployment
-
-- **Established Warm Zone:** Law enforcement has declared specific areas clear of active threats.
-- **Force Protection Available:** Dedicated law enforcement officers are assigned to provide force protection for each RTF.
-- **RTF Team Equipped:** Personnel identified, wearing ballistic protective equipment, carrying hemorrhage control and rapid patient movement **[HIGHLIGHTED: gear]**.
-- **Communications Plan:** Clear radio channel established for RTF teams.
-- **Secure Ingress/Egress Route:** Law enforcement has identified and physically secured a path into and out of the warm zone.
-
-#### Operational Zone Definitions
-
-<!-- structure: duplicate bullet points removed here. The callout box below is the single authoritative definition of operational zones. The Warm Zone definition has been updated to incorporate the additional operational detail that appeared only in the (now-removed) bullet version: "If security changes, the zone instantly becomes hot and RTFs withdraw." -->
-
-> **OPERATIONAL ZONE DEFINITIONS**
-> **Hot Zone:** Area of active or highly suspected threat. Only law enforcement operates here. Fire/EMS do not enter under any circumstances.
-> **Warm Zone:** Areas cleared by law enforcement but not fully secured. RTFs operate here with law enforcement force protection. All personnel wear ballistic protection. If security changes, the zone instantly becomes hot and RTFs withdraw.
-> **Cold Zone:** Safe area with no significant risk. Command posts, staging areas, and medical treatment and transport areas are located here.
-
-Personnel must stay in their assigned zones at all times. If unsure whether an area is hot or warm, treat it as hot until confirmed otherwise.
-
-#### RTF Functions
-
-- **Rapid Casualty Location and Assessment:** Move through assigned sectors locating all victims. Direct walking wounded to self-evacuate to the cold zone.
-- **Immediate Life-Saving Interventions:** Apply tourniquets, pack and dress gunshot wounds, seal open chest wounds, protect airways. Focus on hemorrhage control as the top medical priority.
-- **Rapid Extraction to Casualty Collection Points:** Stabilize enough to move, then evacuate. The mantra is "treat and move." Warm-zone care takes under two minutes per patient; detailed treatment happens in the cold zone.
-- **Continuous Triage and Handoff:** Flag/Tag patients by severity. Provide brief handoff reports to receiving personnel at the casualty collection point.
-
-#### Tactical Emergency Medical Priorities
-
-Medical operations in Phase 2 follow tactical emergency care principles. Priorities follow the M.A.R. components of the MARCH algorithm: massive hemorrhage control (tourniquets, wound packing, pressure dressings), airway and respiration management (jaw-thrust, chest seals, needle decompression for tension pneumothorax), rapid triage, extraction to a treatment area, and transport to definitive care.
-
-#### Coordinating Medical and Security Operations
-
-At the command level, the law enforcement and fire/EMS commanders jointly decide how many RTFs to deploy and where, prioritize search areas, and manage the pace of operations. Once a Rescue Group is established, the Rescue Group Supervisor (RGS) will manage all RTFs. A fire officer may be the formal RGS, but a designated law enforcement counterpart should coordinate closely with the RGS, or vice versa. Ideally, the two supervisors are co-located and standing side by side, with one focusing on victim care and the other on security.
-
-### 4.3 Phase 3 – Recovery and Transition
-
-Phase 3 begins when the immediate threat has been neutralized and all known critical victims have been addressed. The Incident Commander declares the shift from emergency response to recovery and scene management.
-
-#### Command Priorities
-
-- **Ensure Scene Security and Integrity:** Maintain perimeters for both security and evidence preservation. Restrict access to essential personnel.
-- **Care for the Injured and Affected:** Confirm no additional victims remain untreated. Establish survivor assembly and family reunification areas. Deploy crisis counseling resources.
-- **Public Information Management:** Activate a Joint Information Center. Issue one unified message from all agencies. Control rumors.
-- **Assign Detectives to Identify All Transported Patients:** Ensure positive identification of every patient transported from the scene to hospitals. This is critical for family notification and investigative accountability.
-- **Resource Management and Relief:** Rotate fresh personnel in. Establish rehab areas. Plan for sustained operations including shift coverage, lighting, and logistics.
+Twin studies suggest that emotion regulation and empathy have heritable components. Estimates of heritability for emotion-related traits range from approximately 30% to 50%, leaving substantial variance attributable to environmental influences including early attachment relationships, socialization, and education (Scourfield et al., 2004). Oxytocin, a neuropeptide associated with social bonding, has been linked to empathic responsiveness and prosocial behavior, providing a hormonal substrate for the interpersonal dimensions of EI (Domes et al., 2007).
 
 <!-- flow: added section lead-out -->
-The effective execution of all three phases depends on sound command procedures—beginning the moment the first responder arrives on scene, as described in the following section.
+The neurological evidence establishes that emotional capacities have distinct biological substrates — but the question of how to reliably measure these capacities in applied settings has proven far more contested, generating a substantial and technically demanding literature on EI assessment.
 
 ---
 
-## 5. COMMAND PROCEDURES
+## Measurement and Assessment of Emotional Intelligence
 
-### 5.1 First Officer on Scene
+### Ability-Based Measures
 
-The first arriving responder has both the authority and responsibility to establish command, regardless of discipline or rank. This is a core ICS principle: someone must start organizing the response immediately. Waiting for a higher-ranking officer could lead to dangerous delays.
+The MSCEIT (Mayer et al., 2002) is the primary operationalization of the ability model. It presents respondents with emotionally laden stimuli — faces, abstract designs, hypothetical scenarios — and asks them to identify emotions, predict emotional consequences, and reason about emotional management strategies. Scores are derived by comparing responses to consensus norms established from large normative samples. The MSCEIT demonstrates adequate internal consistency and has shown incremental predictive validity for outcomes including academic performance and leadership effectiveness (Brackett et al., 2006).
 
-#### Responsibilities
+Criticisms of the MSCEIT center on the scoring criterion: if emotional consensus is itself influenced by cultural norms and social desirability, the test may measure not a pure cognitive ability but rather conformity to culturally sanctioned emotional expression (Roberts et al., 2001). Test-retest reliability has also been found to be lower than for established cognitive ability measures.
 
-- Establish and announce Mobile Command using a clear incident name (e.g., Main Street Command), and engage the immediate threat if lives are at risk. Perform a rapid size-up: nature of incident, exact location, suspect information, victim estimates, immediate hazards, available cover, initial resource needs, and zone designations.
-- Communicate situational updates to dispatch and incoming responders using plain language.
-- Establish initial control measures: identify hot, warm, and cold zones; set inner perimeter; identify safe approach routes and staging areas.
-- Request additional resources.
-- Organize incoming units with specific task assignments.
-- Maintain command until formally relieved.
+### Self-Report Measures
 
-#### Initial Radio Communication
+Several self-report instruments are widely used:
 
-The first radio broadcast should be concise and accomplish multiple tasks: identify the officer on scene, describe the incident, name the command, and give initial directions. Example: "Lincoln 3 on scene - active shooter at the school, multiple victims in the lobby. I am establishing Central School Command. Suspect last seen heading north hallway. Need additional units for perimeter north side. Fire and EMS stage at Maple and 1st." All communications use plain language, no agency-specific codes.
+- **TEIQue** (Petrides & Furnham, 2003): 153-item measure of trait EI across 15 facets
+- **Bar-On Emotional Quotient Inventory (EQ-i)** (Bar-On, 1997): 133-item mixed-model measure across five composite scales
+- **Schutte Self-Report Emotional Intelligence Test (SSEIT)** (Schutte et al., 1998): 33-item measure based on the original Salovey-Mayer model
 
-### 5.2 Mobile Command
+Self-report measures are cost-effective, easy to administer at scale, and have demonstrated associations with a range of outcomes. However, they are susceptible to response bias, social desirability effects, and the fundamental limitation that self-perceived emotional competence may not correspond to actual competence (Brackett & Mayer, 2003).
 
-Mobile command is the practice of the first arriving officer serving as incident commander while still directly engaged in the unfolding incident. This is doctrinally legitimate and expected. ICS and NIMS demand that command be established immediately—they do not require the first Incident Commander to be at a stationary command post. Mobile command bridges the gap between incident onset and the establishment of a formal command structure.
+### Observer-Report and 360-Degree Measures
 
-### 5.3 Role of Second Supervisor
+Multi-rater instruments, such as the Emotional Competence Inventory (ECI; Boyatzis & Goleman, 2001), address the self-report limitation by aggregating ratings from supervisors, peers, and subordinates. These approaches reduce individual response bias but introduce new challenges including rater leniency effects, halo effects, and the influence of behavioral visibility on ratings.
 
-When a second supervisor arrives, they should typically assume the Incident Commander role, freeing the first supervisor or officer to focus on tactical operations. The second supervisor's arrival creates a critical division of labor: one leader manages the tactical fight, the other coordinates the overall incident.
+### Psychometric Considerations
 
-### 5.4 Transfer of Command
-
-Command transfers follow a structured protocol to maintain continuity:
-- The incoming commander reports to the current IC and receives a situation briefing covering: incident status, actions taken, resources deployed, safety concerns, and communications plan.
-- The incoming commander explicitly accepts command.
-- A clear radio announcement informs all personnel of the change (e.g., "All units, be advised: Lieutenant Smith now has Command").
-- The outgoing commander transitions to a subordinate role, preserving their situational knowledge within the operation.
-- When command transfers, the new commander should identify themselves by position or call sign (e.g., "Staff 3") so all units know who is directing the incident.
-
-There must be no gap in leadership. The outgoing IC remains in command until the incoming commander explicitly states they have it. Multiple transfers may occur during an incident—from mobile to a fixed command post to an investigative command—and this complexity should be anticipated and practiced.
-
-### 5.5 Transition from Mobile to Fixed Command Post
-
-When conditions allow—threat level reduced, multi-agency personnel present, sufficient command staff available—command transitions to a fixed location in the cold zone. The fixed location should have strong radio reception, adequate space for unified leadership, and be clearly identified for incoming units.
+A central question in the EI measurement literature concerns incremental validity: does EI predict important outcomes over and above general intelligence (g) and the Big Five personality dimensions (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)? Several meta-analyses have found modest but significant incremental validity for ability EI (Van Rooy & Viswesvaran, 2004; Joseph & Newman, 2010), while mixed-model measures show higher raw correlations with outcomes but lower incremental validity due to their overlap with personality constructs.
 
 <!-- flow: added section lead-out -->
-The transition to a fixed command post marks the natural point at which multi-agency Unified Command is fully established—the structure described in the following section.
+The incremental validity question is ultimately answered not by psychometric analysis alone, but by the empirical evidence linking EI to real-world outcomes — the domain to which the next section turns.
 
 ---
 
-## 6. UNIFIED COMMAND
+## Empirical Evidence: Outcomes Associated with Emotional Intelligence
 
-### 6.1 Purpose and Importance
+### Academic and Cognitive Performance
 
-Unified Command is the cornerstone of URVI. It ensures that law enforcement, fire, EMS, and other relevant agencies jointly manage the incident under one coherent plan. No single agency can handle all aspects of a major violent incident alone. Unified Command prevents confusion and delays, ensures threat containment and medical care happen simultaneously, and improves responder safety through coordinated action.
+MacCann et al. (2020) conducted a comprehensive meta-analysis of 158 studies (N = 42,529) examining the relationship between EI and academic achievement. They found that EI was a statistically significant predictor of GPA and standardized test performance, even after controlling for IQ and personality — though effect sizes were modest (r = .20). Proposed mechanisms include better emotion regulation reducing test anxiety, stronger peer relationships facilitating collaborative learning, and greater academic motivation among high-EI students.
 
-### 6.2 Triggers for Formation
+### Workplace and Organizational Outcomes
 
-Unified Command should be established the moment two or more agencies are actively engaged.
+Research on EI and occupational performance has produced a substantial literature. Daus and Ashkanasy (2005) reviewed evidence supporting the predictive validity of ability EI for job performance, particularly in occupations involving high emotional labor — those requiring sustained management of one's own emotional displays in service of organizational goals (e.g., healthcare, education, customer service, sales).
 
-### 6.3 Unified Command Responsibilities
+Leadership represents a particularly well-studied domain. Rubin et al. (2005) found that EI was positively associated with transformational leadership behaviors — inspiring vision, intellectual stimulation, and individualized consideration of followers — even after controlling for personality. EI has further been associated with team cohesion, organizational citizenship behavior, and reduced counterproductive work behavior (Lopes et al., 2006).
 
-- Establish overall incident objectives and priorities. Law enforcement should lead but must integrate medical resources seamlessly. Priority sequence: eliminate the threat, ensure security and stabilization, provide medical care, preserve evidence.
-- Develop and implement a shared Incident Action Plan.
-- Assign roles and tasks across agencies, leveraging each discipline's expertise.
-- Manage resources and maintain situational awareness by gathering input from all disciplines.
-- Ensure responder safety: evaluate risks, designate zones, mandate protective equipment.
-- Coordinate phase transitions and handoffs to investigative or recovery authorities.
-- Face-to-face coordination among unified commanders for critical decisions.
+### Mental Health and Well-Being
 
-### 6.4 Command Post Setup
+Martins et al. (2010) conducted a meta-analysis of 44 studies examining the relationship between EI and mental health outcomes. Higher EI was consistently associated with lower levels of depression, anxiety, and burnout, and higher levels of psychological well-being. Emotion regulation — specifically the use of cognitive reappraisal rather than expressive suppression — emerged as a key mediating mechanism. Individuals higher in EI appear better equipped to apply adaptive coping strategies under stress, contributing to greater resilience.
 
-The Unified Command Post should be in the cold zone, clearly identified, accessible to all agencies, and equipped with reliable communications. In the earliest moments, this may be two vehicles parked next to each other—what matters is that all key leaders are physically together, making joint decisions. Co-location is the guiding principle. As resources arrive, the command post can expand to a dedicated vehicle or indoor space.
+### Interpersonal Relationships and Social Functioning
 
-### 6.5 Communication Protocols
+EI is associated with higher quality interpersonal relationships across multiple contexts. Lopes et al. (2004) found that individuals higher in ability EI reported more positive interactions with peers, greater perceived social support, and less interpersonal conflict. In romantic relationships, partner responsiveness — a central predictor of relationship satisfaction — has been linked to empathic accuracy, a capacity closely related to the perception and understanding branches of the ability model. EI is also associated with more constructive conflict resolution behaviors and lower levels of aggression (Brackett et al., 2004).
 
-- A designated command radio channel monitored by all agencies' leadership.
-- Integrated dispatch communication linking police, fire, and EMS dispatch centers.
-- Plain language at all times—no agency-specific codes or jargon.
-- Regular unified briefings to maintain alignment.
-- One unified voice to the field: messages are agreed upon and not contradictory.
+### Health Behaviors
 
-A communications plan is critical to operational success and should be established as one of the first Unified Command actions.
-
-### 6.6 Preventing Conflict in Multi-Agency Command
-
-Conflict is prevented through the establishment of unified objectives, clear division of labor under one plan, strong communication discipline, and a cooperative leadership ethos. When disagreements arise, unified commanders resolve them privately through discussion, then present a unified decision to the field. Pre-incident planning, joint training exercises, and established mutual aid agreements remove much of the ambiguity that breeds conflict during operations.
+Schutte et al. (2007) reviewed evidence linking EI to health outcomes, finding associations between higher EI and healthier behavioral patterns including lower rates of substance use, more regular physical activity, and better dietary choices. The proposed mechanism is consistent with findings in the mental health domain: higher EI supports better emotion regulation, reducing reliance on maladaptive coping behaviors such as substance use or binge eating as strategies for managing negative affect.
 
 <!-- flow: added section lead-out -->
-Among Unified Command's most critical operational responsibilities during Phase 2 is the deployment and management of Rescue Task Forces—the integrated police-fire/EMS teams described in the following section.
+While the empirical record is broadly supportive, a careful reading of the literature also reveals persistent methodological and conceptual challenges — challenges that critics have pressed with increasing rigor and that the field cannot responsibly ignore.
 
 ---
 
-## 7. RESCUE TASK FORCES (RTFs)
+## Critiques, Controversies, and Limitations
 
-### 7.1 Definition and Composition
+### Construct Validity
 
-A Rescue Task Force is a unified team of fire/EMS personnel and law enforcement officers formed to rapidly treat and extract victims in the warm zone. Standard composition pairs two to four firefighter/EMS members with at least two law enforcement officers providing force protection. Each RTF operates as a single cohesive unit with a unique designator (e.g., "RTF-1") and a single team leader.
+The most persistent critique concerns whether EI is a coherent, distinct construct or an amalgam of known psychological variables. Analyses examining the overlap between EI measures and the Big Five have found particularly high correlations between mixed-model EI measures and Agreeableness and low Neuroticism — raising the question of whether such measures capture variance not already explained by established personality inventories (Davies et al., 1998). Ability measures show lower personality overlap but still face questions about their relationship to crystallized intelligence.
 
-The medical members handle casualty care while law enforcement officers provide 360-degree force protection, lead movement, and control the team's tempo. RTF members carry modified medical kits focused on hemorrhage control and airway management—lightweight and agile for rapid movement.
+### Measurement Fragmentation
 
-### 7.2 RTF Formation
+The low intercorrelations between ability, trait, and mixed measures of EI — in some meta-analyses no higher than those between unrelated personality dimensions — suggest that different measurement approaches are capturing meaningfully different constructs (Joseph & Newman, 2010). This fragmentation complicates the accumulation of scientific knowledge: findings from self-report studies cannot be straightforwardly generalized to ability-based operationalizations, and vice versa.
 
-RTFs are assembled in real time as units arrive on scene, under Unified Command direction. Once warm zones are identified and sufficient force protection is available, command pairs law enforcement officers with fire/EMS crews. Each RTF should ideally receive a clear assignment, insertion point, and communication channel. Pre-planned interoperability <!-- prose: hyphen→em-dash (parenthetical aside) -->— common training, compatible radios, and interagency trust — is essential for rapid assembly.
+### Publication Bias and Effect Size Inflation
 
-### 7.3 Roles Within the RTF
+The EI literature is not immune to publication bias — the tendency for journals to preferentially publish positive findings. Several meta-analyses have identified evidence of funnel plot asymmetry consistent with bias toward statistically significant results, suggesting that population effect sizes are smaller than the published literature implies. Landy (2005) argued that the field's practical claims — particularly those associated with Goleman's popular formulations — substantially exceed what the controlled evidence supports.
 
-Law enforcement officers serve as the protective overwatch. They lead movement, secure corridors and doorways, maintain 360-degree force protection around <!-- prose: "medics" → "fire/EMS personnel" (terminology consistency) -->fire/EMS personnel, and control the pace. Officers do not separate from the RTF or pursue independent actions. Their sole mission is RTF team safety.
+### Cultural Validity
 
-Fire/EMS personnel focus on medical operations: rapid assessment, life-saving interventions (following the MARCH algorithm, e.g., tourniquets, wound packing, chest seals, airway management), triage decisions, and patient evacuation. They operate under the tactical parameters set by law enforcement; if officers say a location is not secure, <!-- prose: "medics" → "fire/EMS personnel" (terminology consistency) -->fire/EMS personnel adapt accordingly.
+The majority of EI research has been conducted in North American and Western European contexts. The emotional display rules, social norms, and cultural scripts embedded in EI measures may not translate across cultural contexts in which emotional expression, regulation, and empathy are differently understood and valued. Cross-cultural validation of EI measures and theoretical models remains limited.
 
-### 7.4 Deployment Triggers and Priorities
+### Response to Critiques
 
-RTF deployment requires a designated warm zone, sufficient force protection, and appropriately equipped RTF teams (URVI PPE: ballistic helmet, **[HIGHLIGHTED: Level 3 ballistic vest with plate]**, and no turnout gear). If resources are limited, command deploys to where immediate intervention will save the most lives and assigns subsequent teams as they become available.
-
-### 7.5 Operational Cohesion
-
-RTF members move together and stay together at all times. The team does not split up. Law enforcement and fire/EMS maintain visual contact throughout operations. Every movement is communicated and acknowledged within the team. If one member pauses (treating a patient or reloading), the entire team pauses. Anyone on the team should speak up to improve communications or voice safety concerns—this is encouraged and expected.
-
-### 7.6 RTF-to-Command Communication
-
-- Each RTF uses a designated call sign <!-- prose: added comma after "e.g." (standard American English style) -->(e.g., RTF 1, RTF 2, etc.) and communicates with command on the specified channel.
-- Regular status reports: area cleared, patient count, supply needs, team status.
-- Emergency calls use plain language for immediate threat situations.
-- Medical information relay: number and severity of patients, resource needs.
-- All orders from command are acknowledged by RTF leaders.
-
-### 7.7 Withdrawal Criteria
-
-RTFs withdraw when conditions deteriorate beyond acceptable risk:
-- The warm zone becomes hot (active threat re-emerges in the RTF's area).
-- Loss of communications with command or law enforcement overwatch.
-- Team member injury requiring immediate evacuation.
-- Explicit command order (e.g., tactical operation about to commence in the area). All RTF members are trained to react immediately to withdrawal orders.
-
-### 7.8 Multiple RTF Oversight
-
-For large incidents with multiple RTFs, a Rescue Group Supervisor is assigned to maintain accountability for all RTFs. Command deconflicts RTF operations with ongoing tactical operations to ensure rescue and tactical efforts complement rather than endanger each other.
+Mayer, Roberts, and Barsade (2008) offered a systematic response to major critiques of the EI construct, arguing that the ability model's psychometric properties are comparable to those of established intelligence facets, that incremental validity above personality and IQ — while modest — is theoretically meaningful, and that the conflation of ability EI with mixed-model formulations in critical reviews obscures genuine scientific progress. They acknowledged remaining challenges while defending the legitimacy of the scientific enterprise.
 
 <!-- flow: added section lead-out -->
-The effectiveness of RTF operations—and of all incident coordination—depends on reliable, disciplined communications across all agencies, as addressed in the following section.
+Acknowledging these critiques does not render EI scientifically untenable; rather, it sharpens the questions that applied researchers and practitioners must address when translating the construct into educational, organizational, and clinical settings.
 
 ---
 
-## 8. COMMUNICATIONS AND INTEROPERABILITY
+## Implications for Education, Training, and Practice
 
-### 8.1 Communications Principles
+### Social-Emotional Learning in Educational Settings
 
-Effective communication is the foundation of unified response and requires plain language at all times during violent incident operations—no ten-codes, no agency-specific jargon. All responders must understand every message transmitted. Common terminology for zones (hot, warm, cold), teams (contact team, RTF), and roles (Incident Commander, Operations, Contact Group Supervisor, Rescue Group Supervisor, Staging) is standardized across disciplines.
+The Collaborative for Academic, Social, and Emotional Learning (CASEL) has developed a framework for Social-Emotional Learning (SEL) that encompasses five core competencies closely aligned with EI: self-awareness, self-management, social awareness, relationship skills, and responsible decision-making. Meta-analytic reviews of school-based SEL programs have found meaningful positive effects on academic achievement, prosocial behavior, and reductions in conduct problems (Durlak et al., 2011), suggesting that emotion-related skills can be systematically developed in educational contexts.
 
-### 8.2 Radio Channel Architecture
+### Organizational Training and Development
 
-Unified Command establishes a communications plan as one of its first actions. This typically includes a command channel for leadership coordination and a tactical channel for field operations. If interoperable frequencies are not available, supervisory personnel may share portable radios to bridge the communication gap.
+EI training programs in workplace settings have proliferated alongside the growth of the EI literature. Heckman and Kautz (2012) reviewed evidence on the malleability of socio-emotional skills across the lifespan, concluding that such skills are most readily developed in early childhood but that structured interventions can produce meaningful gains in adults. Studies of EI-focused leadership coaching and training programs have reported positive effects on EI scores and behavioral outcomes, though methodological limitations — including the absence of active control conditions and reliance on self-report outcome measures — temper conclusions about efficacy.
 
-### 8.3 Not All Agencies Can Communicate Directly
+### Clinical Applications
 
-The framework acknowledges that not all law enforcement agencies can communicate directly with fire departments due to incompatible radio systems. Planning should account for this limitation through pre-designated interoperable channels, relay procedures, face-to-face communication at co-located command posts, and liaison officers who bridge the communications gap.
-
-### 8.4 Information Flow During Operations
-
-Critical information must flow in both directions between field teams and Unified Command. Field teams report: threat status, victim locations and counts, areas cleared, hazards encountered, and resource needs. Command pushes: zone status updates, tactical operation warnings, phase transitions, and resource deployments. Information flow should be continuous but disciplined—every transmission should be short, necessary, and actionable. Over-communication of important safety information is preferred over assumptions.
-
-### 8.5 Subsequent Control Measures
-
-As the incident evolves, command must communicate updated control measures to all units. This includes changes to zone boundaries (e.g., "Floor 1 is now cold, Floor 2 warm, Floor 3 hot"), updated staging locations, modified ingress/egress routes, and shifts in tactical focus. Each update is broadcast clearly and acknowledged by affected units.
+EI-informed interventions have found application in clinical psychology, particularly in the context of emotion regulation deficits associated with mood disorders, anxiety disorders, and borderline personality disorder. Mindfulness-based interventions, which cultivate non-judgmental awareness of emotional states, can be conceptualized as targeting capacities aligned with the perception and management branches of the ability model. Cognitive behavioral therapy (CBT) protocols explicitly targeting emotion regulation — such as dialectical behavior therapy (DBT) — have demonstrated efficacy for populations with significant emotion dysregulation.
 
 <!-- flow: added section lead-out -->
-The communications discipline described in this section does not emerge spontaneously in the field—it is built through the joint training and preparedness activities detailed in the following section.
+Taken together, the evidence from educational, organizational, and clinical contexts suggests that EI is not merely a theoretical abstraction but a construct with practical consequences — a finding that gives the concluding synthesis both empirical grounding and applied significance.
 
 ---
 
-## 9. TRAINING AND PREPAREDNESS
+## Conclusion
 
-### 9.1 Joint Training Imperative
+The scientific literature on emotional intelligence supports several conclusions. EI, in its ability-based formulation, represents a psychometrically defensible construct that captures variance in emotion-related cognitive performance not fully accounted for by general intelligence or established personality dimensions. Meta-analytic evidence links EI to consequential outcomes across academic, occupational, interpersonal, and health domains, though effect sizes are generally modest and must be interpreted in the context of the methodological limitations pervasive in the field.
 
-Successful unified response is largely the product of groundwork laid before an incident. Agencies must invest in regular multi-agency training and exercises. Tabletop exercises allow commanders to practice unified decision-making. Full-scale drills simulate real incidents with mock Unified Command Posts, RTF deployments, and communication under stress. These exercises build personal relationships and trust across agencies, surface radio incompatibilities or terminology confusion, and create organizational muscle memory.
+The most significant challenges facing EI research are theoretical and measurement fragmentation, persistent concerns about incremental validity for mixed-model operationalizations, and the outsized influence of popular-press formulations that have consistently overstated the construct's predictive power. Progress will require greater convergence on theoretical definitions, standardization of measurement approaches, and investment in longitudinal, cross-cultural, and neuroimaging research designs capable of addressing remaining questions about EI's causal mechanisms and developmental trajectories.
 
-### 9.2 Training for Phase 2 Operations
-
-Phase 2 operations—RTF deployment, warm zone medical care, and integrated police-fire tactical movement—require dedicated training emphasis. Fire/EMS personnel must be proficient in Tactical Emergency Casualty Care (TECC), comfortable operating in ballistic protective equipment, and practiced in moving with law enforcement force protection. Law enforcement must be trained in force protection tactics, close coordination with non-law personnel, and basic hemorrhage control. Joint RTF drills are essential for building the cross-discipline coordination that saves lives.
-
-### 9.3 First-On-Scene Leadership Training
-
-Patrol officers and junior supervisors must be placed into simulated critical incidents where they practice being the initial incident commander. This includes rapid size-up, command declaration, initial unit assignments, and command transfer. Agencies should provide job aids and checklists, reinforce plain language radio communication, and create a culture where taking initiative is expected and supported.
-
-### 9.4 Pre-Incident Planning
-
-Agencies should jointly develop protocols for Unified Command formation, including pre-designated command post locations for high-risk venues, interoperable radio channels, and information-sharing procedures. Pre-incident planning also includes maintaining contact directories, agreeing on mutual aid triggers, and identifying liaison officers for interdisciplinary deployment.
-
-### 9.5 Empowerment and Support
-
-Training must be paired with organizational empowerment. Agency leadership should clearly communicate that first-on-scene command decisions are expected and supported. Officers who take command and make reasonable decisions under extreme stress should not face unfair second-guessing. This culture of empowerment frees responders to act decisively. Post-incident reviews should specifically examine whether first responders established command and organized the response—and if not, identify training gaps. Clear policy directives establishing the authority of first arriving personnel protect both the individual responder and the agency.
-
-### 9.6 Sample Size-Up Components
-
-Agencies should train first responders to rapidly assess and communicate the following during initial size-up:
-- Nature of incident (active shooter, hostage situation, bombing, etc.) and current dynamics.
-- Exact location and scope of affected area.
-- Suspect information: number, description, weapons, last known location and direction of movement.
-- Victim and casualty estimates.
-- Immediate threats and hazards beyond the primary suspect (secondary devices, fire, hazmat).
-- Available cover, terrain, entry and exit points.
-- Initial resource needs and requested assets.
-- Preliminary zone designations and perimeter recommendations.
-
-Training with sample size-up scenarios—including verbal practice under simulated stress—builds the muscle memory that enables rapid, accurate communication during real events.
-
-<!-- flow: added section lead-out -->
-Even the best-trained agencies must manage the practical challenges of multi-jurisdictional resource coordination when a major incident draws units from across the county—the subject of the following section.
+What the evidence does not support is dismissal. Emotional intelligence, properly defined and carefully measured, occupies a legitimate place in the scientific study of human psychological competence — one with meaningful implications for how we understand learning, leadership, health, and human relationships.
 
 ---
 
-## 10. MUTUAL AID AND RESOURCE MANAGEMENT
+## References
 
-### 10.1 Managing Incoming Resources
+Bar-On, R. (1997). *Bar-On Emotional Quotient Inventory: Technical manual*. Multi-Health Systems.
 
-In the early phase of a critical incident, resources often arrive rapidly from **[HIGHLIGHTED: across the county]**. The Incident Commander must manage this influx to prevent chaos. **[HIGHLIGHTED: The first priority]** is establishing a staging area in the cold zone where incoming units report and await assignment. Without direction, uncontrolled convergence can lead to crossfire incidents, traffic gridlock, or dilution of effort. The IC will assign arriving or staged units to critical tasks: forming additional contact teams, staffing perimeter positions, securing staging areas, or preparing for RTF deployment. Effective resource management means preventing overcommitment—not every arriving officer should rush inside. Some are better used for perimeter security, traffic control, or staging management. The IC must continuously evaluate priorities and distribute personnel accordingly.
+Boyatzis, R. E., Goleman, D., & Hay/McBer. (2001). *Emotional Competence Inventory*. Hay Group.
 
-### 10.2 Mutual Aid Integration
+Brackett, M. A., & Mayer, J. D. (2003). Convergent, discriminant, and incremental validity of competing measures of emotional intelligence. *Personality and Social Psychology Bulletin*, *29*(9), 1147–1158.
 
-Los Angeles County's multi-jurisdictional landscape means that significant violent incidents will draw resources from multiple agencies. Mutual aid units arriving from other jurisdictions must be seamlessly integrated into the existing Incident Command System structure. They report to staging, receive assignments from the IC, and operate under the unified plan. Pre-established mutual aid agreements and common training in ICS/NIMS principles make this integration possible.
+Brackett, M. A., Mayer, J. D., & Warner, R. M. (2004). Emotional intelligence and its relation to everyday behaviour. *Personality and Individual Differences*, *36*(6), 1387–1402.
 
-Mutual aid personnel should receive a quick briefing upon arrival covering: incident status, current command structure, radio channels in use, and their specific assignment. The goal is to get them operational quickly without disrupting the existing organization. A staging area manager logs all arriving mutual aid units and their capabilities.
+Brackett, M. A., Rivers, S. E., Shiffman, S., Lerner, N., & Salovey, P. (2006). Relating emotional abilities to social functioning: A comparison of self-report and performance measures of emotional intelligence. *Journal of Personality and Social Psychology*, *91*(4), 780–795.
 
-### 10.3 Resource Tracking
+Damasio, A. R. (1994). *Descartes' error: Emotion, reason, and the human brain*. Putnam.
 
-Unified Command maintains accountability of all resources through continuous tracking. This includes knowing which units are deployed and where, which are in staging awaiting assignment, and which have been released. Resource tracking ensures that if conditions change, command can rapidly reassign or recall units. It also provides essential data for after-action review.
+Daus, C. S., & Ashkanasy, N. M. (2005). The case for the ability-based model of emotional intelligence in organizational behavior. *Journal of Organizational Behavior*, *26*(4), 453–466.
 
-### 10.4 Preventing Freelancing/Self-deployment and Overlap
+Davidson, R. J., Jackson, D. C., & Kalin, N. H. (2000). Emotion, plasticity, context, and regulation: Perspectives from affective neuroscience. *Psychological Bulletin*, *126*(6), 890–909.
 
-A persistent challenge in large incidents is preventing **[HIGHLIGHTED: freelancing]**—individual responders or units taking independent action outside the incident command structure. Freelancing/self-deployment compromises accountability, creates safety risks, and can undermine the unified plan. The framework addresses this through clear command structure, mandatory check-in at staging, specific task assignments for all arriving units, and a culture of discipline reinforced through training. Every responder operates under the incident organization, following the direction of their assigned supervisor.
+Davies, M., Stankov, L., & Roberts, R. D. (1998). Emotional intelligence: In search of an elusive construct. *Journal of Personality and Social Psychology*, *75*(4), 989–1015.
 
-<!-- flow: added section lead-out -->
-The quick-reference checklists in the following section consolidate the key decision points and responsibilities from Sections 4 through 10 into an actionable format for use in the field.
+Domes, G., Heinrichs, M., Michel, A., Berger, C., & Herpertz, S. C. (2007). Oxytocin improves "mind-reading" in humans. *Biological Psychiatry*, *61*(6), 731–733.
 
----
+Durlak, J. A., Weissberg, R. P., Dymnicki, A. B., Taylor, R. D., & Schellinger, K. B. (2011). The impact of enhancing students' social and emotional learning: A meta-analysis of school-based universal interventions. *Child Development*, *82*(1), 405–432.
 
-## 11. OPERATIONAL QUICK-REFERENCE
+Gardner, H. (1983). *Frames of mind: The theory of multiple intelligences*. Basic Books.
 
-### 11.1 First Officer on Scene Checklist
+Goleman, D. (1995). *Emotional intelligence: Why it can matter more than IQ*. Bantam Books.
 
-- ☐ Announce arrival and establish command: "[Unit] on scene, establishing [Location] Command."
-- ☐ Identify and broadcast: incident type, suspect description, weapons, location, direction of movement.
-- ☐ If active threat: move toward threat to engage or contain. If threat contained: begin organizing.
-- ☐ Designate hot/warm/cold zones (even if preliminary).
-- ☐ Request additional resources.
-- ☐ Identify staging area for incoming units.
-- ☐ Assign arriving units to specific tasks: contact teams, perimeter, staging.
-- ☐ Maintain command until formally relieved by a higher authority.
+Heckman, J. J., & Kautz, T. (2012). Hard evidence on soft skills. *Labour Economics*, *19*(4), 451–464.
 
-### 11.2 Supervisor Arrival Checklist
+Joseph, D. L., & Newman, D. A. (2010). Emotional intelligence: An integrative meta-analysis and cascading model. *Journal of Applied Psychology*, *95*(1), 54–78.
 
-- ☐ Announce assumption of command or confirm existing IC.
-- ☐ Receive briefing from initial IC: threat status, resources deployed, victims, hazards.
-- ☐ Establish or confirm fixed command post location in cold zone.
-- ☐ Verify perimeter positions and staging area.
-- ☐ Contact fire/EMS commander to establish Unified Command.
-- ☐ Ensure communications plan is in place (shared channels, plain language).
-- ☐ Begin tracking resources and assignments.
-- ☐ Plan for Phase 2 transition: RTF readiness, warm zone identification.
+Landy, F. J. (2005). Some historical and scientific issues related to research on emotional intelligence. *Journal of Organizational Behavior*, *26*(4), 411–424.
 
-### 11.3 Unified Command Formation Checklist
+LeDoux, J. (1996). *The emotional brain: The mysterious underpinnings of emotional life*. Simon & Schuster.
 
-- ☐ Law enforcement and fire/EMS commanders physically co-located.
-- ☐ Joint situation briefing completed.
-- ☐ Common objectives established (eliminate threat, secure and stabilize, provide medical care).
-- ☐ Incident Action Plan (even verbal) agreed upon.
-- ☐ Communications plan established: command channel, tactical channel, RTF channel.
-- ☐ Roles assigned: Operations, Contact Team Group, Rescue Group, Medical Group, Staging, Safety.
-- ☐ Radio announcement: "Unified Command established at [location] with [agencies]."
+Locke, E. A. (2005). Why emotional intelligence is an invalid concept. *Journal of Organizational Behavior*, *26*(4), 425–431.
 
-### 11.4 RTF Deployment Checklist
+Lopes, P. N., Brackett, M. A., Nezlek, J. B., Schütz, A., Sellin, I., & Salovey, P. (2004). Emotional intelligence and social interaction. *Personality and Social Psychology Bulletin*, *30*(8), 1018–1034.
 
-- ☐ Warm zone confirmed by law enforcement.
-- ☐ RTF teams (FD and LE force protection officers) briefed and assigned.
-- ☐ Fire/EMS members equipped: ballistic vest, helmet, trauma kit.
-- ☐ Communications tested: radio check with command.
-- ☐ Once identified, the insertion point and route are briefed to all team members.
-- ☐ Extraction route identified.
-- ☐ RTF designator assigned (e.g., RTF-1).
-- ☐ Team moves as a single unit—no separation.
+Lopes, P. N., Grewal, D., Kadis, J., Gall, M., & Salovey, P. (2006). Evidence that emotional intelligence is related to job performance and affect and attitudes at work. *Psicothema*, *18*(Suppl.), 132–138.
 
-### 11.5 Phase Transition Decision Points
+MacCann, C., Jiang, Y., Brown, L. E. R., Double, K. S., Bucich, M., & Minbashian, A. (2020). Emotional intelligence predicts academic performance: A meta-analysis. *Psychological Bulletin*, *146*(2), 150–186.
 
-**PHASE 1 → PHASE 2:**
-- ☐ Suspect neutralized, contained, or isolated from potential victims.
-- ☐ At least partial warm zone established.
-- ☐ RTFs formed and ready.
-- ☐ Unified Command concurrence achieved.
+Martins, A., Ramalho, N., & Morin, E. (2010). A comprehensive meta-analysis of the relationship between emotional intelligence and health. *Personality and Individual Differences*, *49*(6), 554–564.
 
-**PHASE 2 → PHASE 3:**
-- ☐ All known critical victims evacuated.
-- ☐ No active threats confirmed.
-- ☐ Scene security established for recovery operations.
-- ☐ Investigative and recovery personnel arriving.
+Mayer, J. D., Roberts, R. D., & Barsade, S. G. (2008). Human abilities: Emotional intelligence. *Annual Review of Psychology*, *59*, 507–536.
 
-<!-- flow: added section lead-out -->
-For the full definitions of key terms used throughout this framework, refer to the Key Definitions section below.
+Mayer, J. D., Salovey, P., & Caruso, D. R. (2004). Emotional intelligence: Theory, findings, and implications. *Psychological Inquiry*, *15*(3), 197–215.
 
----
+Mayer, J. D., Salovey, P., Caruso, D. R., & Sitarenios, G. (2002). Measuring emotional intelligence with the MSCEIT V2.0. *Emotion*, *2*(3), 315–317.
 
-## 12. KEY DEFINITIONS
+Petrides, K. V., & Furnham, A. (2001). Trait emotional intelligence: Psychometric investigation with reference to established trait taxonomies. *European Journal of Personality*, *15*(6), 425–448.
 
-**Active Assailant:** An individual or individuals actively engaged in killing or attempting to kill people in a populated area, typically using firearms but potentially using any weapon.
+Petrides, K. V., & Furnham, A. (2003). Trait emotional intelligence: Behavioural validation in two studies of emotion recognition and reactivity to mood induction. *European Journal of Personality*, *17*(1), 39–57.
 
-**Casualty Collection Point (CCP):** A designated safe area (typically in the cold zone) where victims are brought for further triage, treatment, and preparation for ambulance transport.
+Petrides, K. V., Pérez-González, J. C., & Furnham, A. (2007). On the criterion and incremental validity of trait emotional intelligence. *Cognition and Emotion*, *21*(1), 26–55.
 
-**Cold Zone:** The safe area surrounding an incident, free of active threat, where command posts, staging, and medical treatment areas are established.
+Roberts, R. D., Zeidner, M., & Matthews, G. (2001). Does emotional intelligence meet traditional standards for an intelligence? Some new data and conclusions. *Emotion*, *1*(3), 196–231.
 
-**Contact Team:** A small group of law enforcement officers (typically 2–4) who move together to locate and neutralize an active threat.
+Rubin, R. S., Munz, D. C., & Bommer, W. H. (2005). Leading from within: The effects of emotion recognition and personality on transformational leadership behavior. *Academy of Management Journal*, *48*(5), 845–858.
 
-**Force Protection:** Law enforcement officers assigned to provide armed security for fire/EMS personnel operating in warm zones.
+Salovey, P., & Mayer, J. D. (1990). Emotional intelligence. *Imagination, Cognition and Personality*, *9*(3), 185–211.
 
-**Hot Zone:** The area of active or suspected threat where only law enforcement operates. Fire/EMS do not enter.
+Scourfield, J., John, B., Martin, N., & McGuffin, P. (2004). The development of prosocial behaviour in children and adolescents: A twin study. *Journal of Child Psychology and Psychiatry*, *45*(5), 927–935.
 
-**Incident Command System (ICS):** A standardized, scalable organizational structure for managing incidents, providing clear chain of command and modular **[HIGHLIGHTED: roles]**.
+Schutte, N. S., Malouff, J. M., Hall, L. E., Haggerty, D. J., Cooper, J. T., Golden, C. J., & Dornheim, L. (1998). Development and validation of a measure of emotional intelligence. *Personality and Individual Differences*, *25*(2), 167–177.
 
-**Mobile Command:** The practice of the first arriving officer serving as incident commander while still engaged in the unfolding incident, **[HIGHLIGHTED: prior to establishing a fixed command post]**.
+Schutte, N. S., Malouff, J. M., Thorsteinsson, E. B., Bhullar, N., & Rooke, S. E. (2007). A meta-analytic investigation of the relationship between emotional intelligence and health. *Personality and Individual Differences*, *42*(6), 921–933.
 
-**NFPA 3000:** The National Fire Protection Association standard for active shooter/hostile event response programs, establishing best practices for unified response.
+Thorndike, E. L. (1920). Intelligence and its uses. *Harper's Magazine*, *140*, 227–235.
 
-**NIMS:** The National Incident Management System, providing principles for multi-agency coordination including common terminology, unified command, and resource management.
-
-**Rescue Task Force (RTF):** A unified team of fire/EMS personnel and law enforcement officers formed to treat and evacuate victims in warm zones under armed protection.
-
-**Rescue Team(s):** Law enforcement resources whose mission it is to enter the Hot Zone to rescue a **[HIGHLIGHTED: victim]**. They are configured to search for and extract the injured from the Hot Zone to the Warm Zone, a CCP, or the Treatment Area/Cold Zone.
-
-**TECC (Tactical Emergency Casualty Care):** Civilian adaptation of military combat casualty care principles, guiding medical treatment in high-threat environments with phases for direct threat, indirect threat, and evacuation care.
-
-**THREAT Protocol:** Response model from the Hartford Consensus: Threat suppression, Hemorrhage control, Rapid Extrication, Assessment, and Transport.
-
-**Unified Command:** A leadership structure where commanders from multiple agencies jointly manage an incident, sharing authority, setting common objectives, and developing a single action plan.
-
-**Warm Zone:** An area cleared by law enforcement but not fully secured, where RTFs operate under armed escort. Personnel wear ballistic protective equipment and remain prepared for rapid withdrawal.
-
----
-
-## 13. REFERENCES
-
-- Advanced Law Enforcement Rapid Response Training (ALERRT) Center, Texas State University.
-- C3 Pathways, Active Shooter Incident Management Checklist Help Guide.
-- California Governor's Office of Emergency Services, Law Enforcement Guide for Emergency Operations (2019).
-- Federal Emergency Management Agency, National Incident Management System, 3rd ed. (2017).
-- Federal Emergency Management Agency, ICS-100: Introduction to the Incident Command System (2018).
-- FIRESCOPE California, ICS-701: Unified Response to Violence Incidents (2023).
-- Hartford Consensus, THREAT Protocol for Active Shooter/Mass Violence Response.
-- International Association of Chiefs of Police, Active Shooter: Model Policy (2014).
-- National Fire Protection Association, NFPA 3000: Standard for an Active Shooter/Hostile Event Response (ASHER) Program (2018).
-- National Fire Protection Association, NFPA 1561: Standard on Emergency Services Incident Management System and Command Safety (2019).
-- National Tactical Officers Association, Active Shooter—ASIM Checklist (2015).
-- U.S. Fire Administration, Fire/EMS Operational Considerations and Guide for Active Shooter and Mass Casualty Incidents (2013).
-
----
-
-## FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION
-
-<!-- layout: This figure is a full-width organizational chart. Reproduce faithfully in Word output using a diagram or table. See visual inventory in doc-visuals output for full specifications. -->
-
-**FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION**
-
-```
-                        Unified Command
-                   (Law Enforcement / Fire / EMS)
-                              |
-              ┌───────────────┴───────────────┐
-        Contact Group                    Rescue Group
-         (Supervisor)                    (Supervisor)
-              |                               |
-       ┌──────┴──────┐                 ┌──────┴──────┐
-  Contact Team 1  Contact Team 2     RTF 1         RTF 2
-```
-
-*Note: This example illustrates a basic organizational structure for coordinating threat engagement and victim rescue during a violent incident. The structure may expand or contract based on incident conditions, available resources, agency policy, and Unified Command direction.*
-
----
-
-## Prose Changes Detail
-
-| # | Section | Original | Changed To | Reason | Status |
-|---|---------|----------|------------|--------|--------|
-| 1 | 7.3 (LE overwatch para.) | "medics" | "fire/EMS personnel" | Terminology consistency | Applied |
-| 2 | 7.3 (FE/EMS para.) | "medics" | "fire/EMS personnel" | Terminology consistency | Applied |
-| 3 | 4.2.4 | "M.A.R. components of the MARCH algorithm" | (unchanged) | Retained — intentional tactical emphasis on warm-zone priorities | Rejected |
-| 4 | 7.2 | "interoperability - common training...trust -" | "interoperability — common training...trust —" | Em-dash for parenthetical (government style) | Applied |
-| 5 | 7.6 | "(e.g. RTF 1, RTF 2..." | "(e.g., RTF 1, RTF 2..." | Standard comma after e.g. | Applied |
+Van Rooy, D. L., & Viswesvaran, C. (2004). Emotional intelligence: A meta-analytic investigation of predictive validity and nomological net. *Journal of Vocational Behavior*, *65*(1), 71–95.

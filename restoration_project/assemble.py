@@ -1,51 +1,413 @@
 """
-URVI Framework — Final Assembly Script
-Generates restoration_project/FINAL_DOCUMENT.docx from 07_polished.md per
-the Layout Notes and the Corporate / Government style spec in the Work Order.
+Emotional Intelligence — APA Academic Paper Assembly
+Generates restoration_project/FINAL_DOCUMENT.docx from 07_polished.md
+per the Layout Notes in 06_formatted.md and APA 7th edition style.
 """
 import os
 import re
 import sys
-from copy import deepcopy
-from docx import Document
-from docx.shared import Pt, Inches, RGBColor, Cm, Emu
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from docx.enum.section import WD_SECTION
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml.ns import qn, nsmap
-from docx.oxml import OxmlElement
+import subprocess
 
 SOURCE = "restoration_project/07_polished.md"
 OUTPUT = "restoration_project/FINAL_DOCUMENT.docx"
 
-DARK_RED = RGBColor(0x8B, 0x00, 0x00)
-LIGHT_GRAY = "F2F2F2"
+try:
+    from docx import Document
+    from docx.shared import Pt, Inches, RGBColor, Cm
+    from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "python-docx", "-q"])
+    from docx import Document
+    from docx.shared import Pt, Inches, RGBColor, Cm
+    from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+
 BLACK = RGBColor(0x00, 0x00, 0x00)
-WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+
+# ---------------------------------------------------------------------------
+# Layout constants (from Layout Notes)
+# ---------------------------------------------------------------------------
+FONT_NAME = "Times New Roman"
+FONT_SIZE_BODY = 12       # pt
+FONT_SIZE_HEADER = 10     # pt
+LINE_SPACING_DOUBLE = 2.0
+INDENT_FIRST_LINE = Inches(0.5)
+HANGING_INDENT = Inches(0.5)
+RUNNING_HEAD = "EMOTIONAL INTELLIGENCE"
 
 
 # ---------------------------------------------------------------------------
-# Markdown parsing
+# XML helpers
+# ---------------------------------------------------------------------------
+
+def set_run_font(run, name=FONT_NAME, size_pt=FONT_SIZE_BODY,
+                 bold=False, italic=False, color=None):
+    run.font.name = name
+    run.font.size = Pt(size_pt)
+    run.bold = bold
+    run.italic = italic
+    if color is not None:
+        run.font.color.rgb = color
+    rPr = run._element.get_or_add_rPr()
+    rFonts = rPr.find(qn("w:rFonts"))
+    if rFonts is None:
+        rFonts = OxmlElement("w:rFonts")
+        rPr.insert(0, rFonts)
+    rFonts.set(qn("w:ascii"), name)
+    rFonts.set(qn("w:hAnsi"), name)
+    rFonts.set(qn("w:cs"), name)
+
+
+def set_double_spacing(paragraph):
+    pf = paragraph.paragraph_format
+    pf.line_spacing_rule = WD_LINE_SPACING.DOUBLE
+    pf.space_before = Pt(0)
+    pf.space_after = Pt(0)
+
+
+def keep_with_next(paragraph):
+    pPr = paragraph._element.get_or_add_pPr()
+    el = OxmlElement("w:keepNext")
+    pPr.append(el)
+
+
+def add_page_break(doc):
+    p = doc.add_paragraph()
+    run = p.add_run()
+    br = OxmlElement("w:br")
+    br.set(qn("w:type"), "page")
+    run._element.append(br)
+    return p
+
+
+def add_page_number_field(paragraph):
+    """Insert a PAGE field into the given paragraph."""
+    run = paragraph.add_run()
+    fldChar1 = OxmlElement("w:fldChar")
+    fldChar1.set(qn("w:fldCharType"), "begin")
+    instrText = OxmlElement("w:instrText")
+    instrText.set(qn("xml:space"), "preserve")
+    instrText.text = " PAGE "
+    fldChar2 = OxmlElement("w:fldChar")
+    fldChar2.set(qn("w:fldCharType"), "end")
+    run._element.append(fldChar1)
+    run._element.append(instrText)
+    run._element.append(fldChar2)
+    set_run_font(run, size_pt=FONT_SIZE_HEADER)
+
+
+def enable_auto_update_fields(doc):
+    settings = doc.settings.element
+    for existing in settings.findall(qn("w:updateFields")):
+        settings.remove(existing)
+    el = OxmlElement("w:updateFields")
+    el.set(qn("w:val"), "true")
+    settings.append(el)
+
+
+# ---------------------------------------------------------------------------
+# Running header
+# ---------------------------------------------------------------------------
+
+def set_running_header(section):
+    """APA style: short title flush left + page number flush right on ALL pages."""
+    section.different_first_page_header_footer = False
+    header = section.header
+    header.is_linked_to_previous = False
+
+    p = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+    for r in list(p.runs):
+        r.text = ""
+
+    # Tab stop: right-aligned at 6.5" (content width on Letter with 1" margins)
+    pPr = p._element.get_or_add_pPr()
+    tabs = OxmlElement("w:tabs")
+    tab_right = OxmlElement("w:tab")
+    tab_right.set(qn("w:val"), "right")
+    tab_right.set(qn("w:pos"), "9360")  # 6.5" × 1440 twips/inch
+    tabs.append(tab_right)
+    pPr.append(tabs)
+
+    run_title = p.add_run(RUNNING_HEAD)
+    set_run_font(run_title, size_pt=FONT_SIZE_HEADER)
+
+    p.add_run("\t")
+    add_page_number_field(p)
+
+
+# ---------------------------------------------------------------------------
+# Title page
+# ---------------------------------------------------------------------------
+
+def build_title_page(doc):
+    """APA 7th title page: title, author, affiliation, course, date."""
+    # Push title down ~1/3 of the page (about 5 blank double-spaced lines)
+    for _ in range(5):
+        bp = doc.add_paragraph()
+        set_double_spacing(bp)
+
+    title_p = doc.add_paragraph()
+    title_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    set_double_spacing(title_p)
+    run = title_p.add_run("Emotional Intelligence")
+    set_run_font(run, bold=True)
+
+    for _ in range(2):
+        sp = doc.add_paragraph()
+        set_double_spacing(sp)
+
+    fields = [
+        ("Author", ""),
+        ("Institutional Affiliation", ""),
+        ("Course Name and Number", ""),
+        ("Instructor", ""),
+        ("2026-05-17", ""),
+    ]
+    labels = [
+        "Author",
+        "Institutional Affiliation",
+        "Course",
+        "Instructor",
+        "2026-05-17",
+    ]
+    for label in labels:
+        lp = doc.add_paragraph()
+        lp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        set_double_spacing(lp)
+        run = lp.add_run(label)
+        set_run_font(run)
+
+
+# ---------------------------------------------------------------------------
+# Inline markdown rendering
+# ---------------------------------------------------------------------------
+
+def add_inline_runs(paragraph, text, bold=False, italic=False,
+                    size_pt=FONT_SIZE_BODY):
+    """Handle **bold**, *italic* inline marks. Ignores nested combinations
+    to keep the parser simple and robust against imperfect markdown."""
+    pattern = re.compile(r"(\*\*[^*]+\*\*|\*[^*\n]+?\*)")
+    pos = 0
+    for m in pattern.finditer(text):
+        if m.start() > pos:
+            run = paragraph.add_run(text[pos:m.start()])
+            set_run_font(run, bold=bold, italic=italic, size_pt=size_pt)
+        tok = m.group(0)
+        if tok.startswith("**"):
+            run = paragraph.add_run(tok[2:-2])
+            set_run_font(run, bold=True, italic=italic, size_pt=size_pt)
+        else:
+            run = paragraph.add_run(tok[1:-1])
+            set_run_font(run, bold=bold, italic=True, size_pt=size_pt)
+        pos = m.end()
+    if pos < len(text):
+        run = paragraph.add_run(text[pos:])
+        set_run_font(run, bold=bold, italic=italic, size_pt=size_pt)
+
+
+# ---------------------------------------------------------------------------
+# APA heading styles
+# ---------------------------------------------------------------------------
+
+def make_heading(doc, text, level):
+    """
+    APA 7th heading levels:
+      Level 1 (##):  Centered Bold
+      Level 2 (###): Flush Left Bold
+      Level 3 (####): Flush Left Bold Italic
+    """
+    p = doc.add_paragraph()
+    set_double_spacing(p)
+    keep_with_next(p)
+
+    if level == 1:
+        # Document title (only used for the paper title on the first body page)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(text)
+        set_run_font(run, bold=True)
+    elif level == 2:
+        # APA Level 1 heading: centered bold
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(text)
+        set_run_font(run, bold=True)
+    elif level == 3:
+        # APA Level 2 heading: flush left bold
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        run = p.add_run(text)
+        set_run_font(run, bold=True)
+    else:
+        # APA Level 3 heading: flush left bold italic
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        run = p.add_run(text)
+        set_run_font(run, bold=True, italic=True)
+
+    return p
+
+
+# ---------------------------------------------------------------------------
+# Body paragraph
+# ---------------------------------------------------------------------------
+
+def make_paragraph(doc, text, indent=True, hanging=False):
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    set_double_spacing(p)
+    pf = p.paragraph_format
+    if hanging:
+        pf.left_indent = HANGING_INDENT
+        pf.first_line_indent = -HANGING_INDENT
+    elif indent:
+        pf.first_line_indent = INDENT_FIRST_LINE
+    add_inline_runs(p, text)
+    return p
+
+
+# ---------------------------------------------------------------------------
+# List items
+# ---------------------------------------------------------------------------
+
+def make_list_item(doc, text, numbered=False, number=None):
+    p = doc.add_paragraph()
+    set_double_spacing(p)
+    pf = p.paragraph_format
+    pf.left_indent = INDENT_FIRST_LINE
+    pf.first_line_indent = -INDENT_FIRST_LINE
+
+    if numbered and number is not None:
+        run = p.add_run(f"{number}. ")
+        set_run_font(run)
+
+    add_inline_runs(p, text)
+    return p
+
+
+# ---------------------------------------------------------------------------
+# Bullet list (APA uses indented run-in items for bulleted lists)
+# ---------------------------------------------------------------------------
+
+def make_list(doc, items):
+    numbered_counter = 1
+    for (kind, text) in items:
+        is_numbered = (kind == "numbered")
+        if is_numbered:
+            make_list_item(doc, text, numbered=True, number=numbered_counter)
+            numbered_counter += 1
+        else:
+            p = doc.add_paragraph()
+            set_double_spacing(p)
+            pf = p.paragraph_format
+            pf.left_indent = INDENT_FIRST_LINE
+            pf.first_line_indent = -INDENT_FIRST_LINE
+            bullet_run = p.add_run("• ")
+            set_run_font(bullet_run)
+            add_inline_runs(p, text)
+
+
+# ---------------------------------------------------------------------------
+# Table (APA style: no vertical lines, horizontal lines only)
+# ---------------------------------------------------------------------------
+
+def make_table(doc, lines):
+    rows = []
+    for ln in lines:
+        if re.match(r"^\s*\|?\s*:?-+", ln):
+            continue
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        rows.append(cells)
+    if not rows:
+        return
+
+    ncols = max(len(r) for r in rows)
+    table = doc.add_table(rows=len(rows), cols=ncols)
+    table.autofit = True
+
+    # Remove all borders, then add only the APA horizontal lines
+    def set_table_borders(tbl):
+        tblPr = tbl._tbl.find(qn("w:tblPr"))
+        if tblPr is None:
+            tblPr = OxmlElement("w:tblPr")
+            tbl._tbl.insert(0, tblPr)
+        tblBorders = OxmlElement("w:tblBorders")
+        for side in ("top", "left", "bottom", "right", "insideH", "insideV"):
+            el = OxmlElement(f"w:{side}")
+            el.set(qn("w:val"), "nil")
+            tblBorders.append(el)
+        tblPr.append(tblBorders)
+
+    set_table_borders(table)
+
+    def add_row_border(row, position, size=6):
+        for cell in row.cells:
+            tcPr = cell._tc.get_or_add_tcPr()
+            tcBorders = tcPr.find(qn("w:tcBorders"))
+            if tcBorders is None:
+                tcBorders = OxmlElement("w:tcBorders")
+                tcPr.append(tcBorders)
+            el = OxmlElement(f"w:{position}")
+            el.set(qn("w:val"), "single")
+            el.set(qn("w:sz"), str(size))
+            el.set(qn("w:color"), "000000")
+            tcBorders.append(el)
+
+    # APA: line above header, line below header, line below last row
+    add_row_border(table.rows[0], "top", size=8)
+    add_row_border(table.rows[0], "bottom", size=6)
+    add_row_border(table.rows[-1], "bottom", size=8)
+
+    for i, row_data in enumerate(rows):
+        cells = row_data + [""] * (ncols - len(row_data))
+        for j, cell_text in enumerate(cells):
+            tc = table.rows[i].cells[j]
+            tc.text = ""
+            p = tc.paragraphs[0]
+            p.paragraph_format.space_before = Pt(3)
+            p.paragraph_format.space_after = Pt(3)
+            is_header = (i == 0)
+            add_inline_runs(p, cell_text, bold=is_header, size_pt=11)
+
+    # Spacer after table
+    sp = doc.add_paragraph()
+    set_double_spacing(sp)
+
+
+# ---------------------------------------------------------------------------
+# Code block (for the four-branch diagram)
+# ---------------------------------------------------------------------------
+
+def make_code_block(doc, lines):
+    for ln in lines:
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
+        p.paragraph_format.line_spacing = 1.0
+        pf = p.paragraph_format
+        pf.left_indent = INDENT_FIRST_LINE
+        run = p.add_run(ln)
+        run.font.name = "Courier New"
+        run.font.size = Pt(10)
+
+
+# ---------------------------------------------------------------------------
+# Markdown parser
 # ---------------------------------------------------------------------------
 
 class Block:
-    def __init__(self, kind, text=None, level=None, items=None, lines=None, meta=None):
-        self.kind = kind          # heading | para | bullet | numbered | hr | blockquote | code | layout
+    def __init__(self, kind, text=None, level=None, items=None, lines=None):
+        self.kind = kind
         self.text = text
         self.level = level
         self.items = items or []
         self.lines = lines or []
-        self.meta = meta or {}
 
 
 def strip_html_comments(text):
-    """Remove <!-- ... --> blocks but keep layout/visual/polish comments out of body text."""
     return re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
 
 
 def parse_markdown(md):
-    """Parse the polished markdown into a flat list of Block objects."""
-    # Remove HTML comments entirely (they're metadata, not body content)
     md = strip_html_comments(md)
     lines = md.split("\n")
     blocks = []
@@ -61,12 +423,11 @@ def parse_markdown(md):
         line = lines[i]
         stripped = line.strip()
 
-        # Skip empty
         if not stripped:
             i += 1
             continue
 
-        # Headings
+        # Heading
         m = re.match(r"^(#{1,6})\s+(.+)$", stripped)
         if m:
             level = len(m.group(1))
@@ -74,7 +435,7 @@ def parse_markdown(md):
             i += 1
             continue
 
-        # Horizontal rule
+        # HR
         if stripped == "---":
             blocks.append(Block("hr"))
             i += 1
@@ -91,17 +452,8 @@ def parse_markdown(md):
             i = j + 1
             continue
 
-        # Blockquote (callout box)
-        if stripped.startswith(">"):
-            quote_lines = []
-            while i < len(lines) and lines[i].strip().startswith(">"):
-                quote_lines.append(re.sub(r"^>\s?", "", lines[i].strip()))
-                i += 1
-            blocks.append(Block("blockquote", lines=quote_lines))
-            continue
-
         # Table
-        if "|" in stripped and i + 1 < len(lines) and re.match(r"^\s*\|?\s*:?-+", lines[i+1]):
+        if "|" in stripped and i + 1 < len(lines) and re.match(r"^\s*\|?\s*:?-+", lines[i + 1]):
             table_lines = []
             while i < len(lines) and "|" in lines[i]:
                 table_lines.append(lines[i])
@@ -109,45 +461,45 @@ def parse_markdown(md):
             blocks.append(Block("table", lines=table_lines))
             continue
 
-        # Bullet / numbered lists (collect contiguous run)
-        if re.match(r"^\s*[-*]\s+", line) or re.match(r"^\s*\d+\.\s+", line):
+        # List
+        if re.match(r"^\s*[-*•]\s+", line) or re.match(r"^\s*\d+\.\s+", line):
             list_lines = []
-            kind = "bullet" if re.match(r"^\s*[-*]\s+", line) else "numbered"
             while i < len(lines):
                 ln = lines[i]
-                if re.match(r"^\s*[-*]\s+", ln) or re.match(r"^\s*\d+\.\s+", ln):
+                if re.match(r"^\s*[-*•]\s+", ln) or re.match(r"^\s*\d+\.\s+", ln):
                     list_lines.append(ln)
                     i += 1
-                elif ln.strip() == "":
-                    # blank line ends list
+                elif not ln.strip():
                     break
                 elif re.match(r"^\s{2,}\S", ln):
-                    # continuation indent — append to last
                     list_lines[-1] += " " + ln.strip()
                     i += 1
                 else:
                     break
             items = []
             for ln in list_lines:
-                m_b = re.match(r"^\s*[-*]\s+(.*)$", ln)
-                m_n = re.match(r"^\s*\d+\.\s+(.*)$", ln)
-                if m_b:
-                    items.append(("bullet", m_b.group(1).strip()))
-                elif m_n:
-                    items.append(("numbered", m_n.group(1).strip()))
-            blocks.append(Block("list", items=items, meta={"kind": kind}))
+                mb = re.match(r"^\s*[-*•]\s+(.*)$", ln)
+                mn = re.match(r"^\s*\d+\.\s+(.*)$", ln)
+                if mb:
+                    items.append(("bullet", mb.group(1).strip()))
+                elif mn:
+                    items.append(("numbered", mn.group(1).strip()))
+            blocks.append(Block("list", items=items))
             continue
 
-        # Paragraph (gather contiguous non-empty, non-special lines)
+        # Paragraph
         buf = []
         while i < len(lines):
             ln = lines[i]
             s = ln.strip()
             if not s:
                 break
-            if re.match(r"^(#{1,6})\s+", s) or s == "---" or s.startswith("```") or s.startswith(">") or re.match(r"^\s*[-*]\s+", ln) or re.match(r"^\s*\d+\.\s+", ln):
+            if (re.match(r"^#{1,6}\s+", s) or s == "---" or
+                    s.startswith("```") or
+                    re.match(r"^\s*[-*•]\s+", ln) or
+                    re.match(r"^\s*\d+\.\s+", ln)):
                 break
-            if "|" in s and i + 1 < len(lines) and re.match(r"^\s*\|?\s*:?-+", lines[i+1]):
+            if "|" in s and i + 1 < len(lines) and re.match(r"^\s*\|?\s*:?-+", lines[i + 1]):
                 break
             buf.append(ln)
             i += 1
@@ -157,591 +509,26 @@ def parse_markdown(md):
 
 
 # ---------------------------------------------------------------------------
-# Word document construction
-# ---------------------------------------------------------------------------
-
-def set_run_font(run, name="Times New Roman", size_pt=11, bold=False, italic=False, color=None, all_caps=False):
-    run.font.name = name
-    run.font.size = Pt(size_pt)
-    run.bold = bold
-    run.italic = italic
-    if color is not None:
-        run.font.color.rgb = color
-    if all_caps:
-        run.font.all_caps = True
-    # East-Asian font override (Word needs explicit rFonts for non-default fonts)
-    rPr = run._element.get_or_add_rPr()
-    rFonts = rPr.find(qn("w:rFonts"))
-    if rFonts is None:
-        rFonts = OxmlElement("w:rFonts")
-        rPr.insert(0, rFonts)
-    rFonts.set(qn("w:ascii"), name)
-    rFonts.set(qn("w:hAnsi"), name)
-    rFonts.set(qn("w:cs"), name)
-
-
-def add_inline_runs(paragraph, text, base_font="Times New Roman", base_size=11, bold=False, italic=False, color=None):
-    """Handle inline **bold**, *italic*, `code` within a paragraph text."""
-    # Bold is checked before italic so `**text**` is not parsed as a pair of italics.
-    # Italic uses a non-greedy match restricted to a single line so an unmatched
-    # asterisk in a long paragraph doesn't swallow content.
-    tokens = []
-    pattern = re.compile(r"(\*\*[^*]+\*\*|`[^`]+`|\*[^*\n]+?\*)")
-    pos = 0
-    for m in pattern.finditer(text):
-        if m.start() > pos:
-            tokens.append((text[pos:m.start()], False, False, False))
-        tok = m.group(0)
-        if tok.startswith("**"):
-            tokens.append((tok[2:-2], True, False, False))
-        elif tok.startswith("`"):
-            tokens.append((tok[1:-1], False, False, True))
-        else:  # single-asterisk italic
-            tokens.append((tok[1:-1], False, True, False))
-        pos = m.end()
-    if pos < len(text):
-        tokens.append((text[pos:], False, False, False))
-    if not tokens:
-        tokens = [(text, False, False, False)]
-
-    for tk_text, tk_bold, tk_italic, tk_code in tokens:
-        run = paragraph.add_run(tk_text)
-        if tk_code:
-            set_run_font(run, name="Courier New", size_pt=10, bold=bold or tk_bold, italic=italic or tk_italic, color=color)
-        else:
-            set_run_font(run, name=base_font, size_pt=base_size, bold=bold or tk_bold, italic=italic or tk_italic, color=color)
-
-
-def shade_paragraph(paragraph, hex_color):
-    pPr = paragraph._element.get_or_add_pPr()
-    shd = OxmlElement("w:shd")
-    shd.set(qn("w:val"), "clear")
-    shd.set(qn("w:color"), "auto")
-    shd.set(qn("w:fill"), hex_color)
-    pPr.append(shd)
-
-
-def set_cell_shading(cell, hex_color):
-    tcPr = cell._tc.get_or_add_tcPr()
-    for existing in tcPr.findall(qn("w:shd")):
-        tcPr.remove(existing)
-    shd = OxmlElement("w:shd")
-    shd.set(qn("w:val"), "clear")
-    shd.set(qn("w:color"), "auto")
-    shd.set(qn("w:fill"), hex_color)
-    tcPr.append(shd)
-
-
-def set_cell_borders(cell, hex_color="8B0000", style="single", size=8, sides=("top", "left", "bottom", "right")):
-    tcPr = cell._tc.get_or_add_tcPr()
-    for existing in tcPr.findall(qn("w:tcBorders")):
-        tcPr.remove(existing)
-    tcBorders = OxmlElement("w:tcBorders")
-    for side in sides:
-        el = OxmlElement(f"w:{side}")
-        if style == "nil":
-            el.set(qn("w:val"), "nil")
-        else:
-            el.set(qn("w:val"), style)
-            el.set(qn("w:sz"), str(size))
-            el.set(qn("w:color"), hex_color)
-        tcBorders.append(el)
-    tcPr.append(tcBorders)
-
-
-def clear_cell(cell):
-    """Empty a cell's first paragraph and return it for re-use."""
-    p = cell.paragraphs[0]
-    for r in list(p.runs):
-        r.text = ""
-    # Remove other paragraphs
-    for extra in list(cell.paragraphs[1:]):
-        extra._element.getparent().remove(extra._element)
-    return p
-
-
-def add_paragraph_border(paragraph, position, size=8, color="8B0000"):
-    """Add a single border to a paragraph. position: 'bottom' | 'top' | 'left' | 'right'."""
-    pPr = paragraph._element.get_or_add_pPr()
-    pBdr = pPr.find(qn("w:pBdr"))
-    if pBdr is None:
-        pBdr = OxmlElement("w:pBdr")
-        pPr.append(pBdr)
-    el = OxmlElement(f"w:{position}")
-    el.set(qn("w:val"), "single")
-    el.set(qn("w:sz"), str(size))
-    el.set(qn("w:space"), "1")
-    el.set(qn("w:color"), color)
-    pBdr.append(el)
-
-
-def set_page_break_before(paragraph):
-    pPr = paragraph._element.get_or_add_pPr()
-    pbb = OxmlElement("w:pageBreakBefore")
-    pPr.append(pbb)
-
-
-def keep_with_next(paragraph):
-    pPr = paragraph._element.get_or_add_pPr()
-    el = OxmlElement("w:keepNext")
-    pPr.append(el)
-
-
-def add_page_break(doc):
-    p = doc.add_paragraph()
-    run = p.add_run()
-    br = OxmlElement("w:br")
-    br.set(qn("w:type"), "page")
-    run._element.append(br)
-
-
-def add_toc_field(doc, switches='\\o "1-3" \\h \\z \\u'):
-    """Insert a Word auto-TOC field. Word populates it when the doc opens
-    (provided updateFields is set to true in settings)."""
-    p = doc.add_paragraph()
-    run1 = p.add_run()
-    fldChar1 = OxmlElement("w:fldChar")
-    fldChar1.set(qn("w:fldCharType"), "begin")
-    fldChar1.set(qn("w:dirty"), "true")
-    run1._element.append(fldChar1)
-
-    run2 = p.add_run()
-    instrText = OxmlElement("w:instrText")
-    instrText.set(qn("xml:space"), "preserve")
-    instrText.text = f" TOC {switches} "
-    run2._element.append(instrText)
-
-    run3 = p.add_run()
-    fldChar2 = OxmlElement("w:fldChar")
-    fldChar2.set(qn("w:fldCharType"), "separate")
-    run3._element.append(fldChar2)
-
-    run4 = p.add_run("Right-click and choose Update Field to populate the Table of Contents.")
-    set_run_font(run4, name="Times New Roman", size_pt=11, italic=True)
-
-    run5 = p.add_run()
-    fldChar3 = OxmlElement("w:fldChar")
-    fldChar3.set(qn("w:fldCharType"), "end")
-    run5._element.append(fldChar3)
-
-
-def enable_auto_update_fields(doc):
-    """Set <w:updateFields w:val="true"/> in settings.xml so Word refreshes
-    fields (TOC, page numbers) when the document is opened."""
-    settings = doc.settings.element
-    # Remove any existing updateFields to avoid duplicates
-    for existing in settings.findall(qn("w:updateFields")):
-        settings.remove(existing)
-    el = OxmlElement("w:updateFields")
-    el.set(qn("w:val"), "true")
-    settings.append(el)
-
-
-def make_heading(doc, text, level, is_first_h2):
-    # Use Word's built-in Heading styles so auto-TOC, navigation, and outline view all work.
-    style_name = f"Heading {min(level, 9)}"
-    p = doc.add_paragraph(style=style_name)
-    pf = p.paragraph_format
-    # Spacing: enough to set headings apart visually but not so much it leaves big gaps
-    pf.space_before = Pt(14) if level <= 2 else Pt(10)
-    pf.space_after = Pt(4)
-    # keep_with_next stops a heading from being stranded at the bottom of a page
-    keep_with_next(p)
-
-    if level == 1:
-        run = p.add_run(text)
-        set_run_font(run, name="Times New Roman", size_pt=18, bold=True, color=DARK_RED)
-        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    elif level == 2:
-        run = p.add_run(text.upper())
-        set_run_font(run, name="Times New Roman", size_pt=14, bold=True, color=BLACK, all_caps=True)
-        add_paragraph_border(p, "bottom", size=6, color="8B0000")
-        # No forced page break — let content flow naturally
-    elif level == 3:
-        run = p.add_run(text)
-        set_run_font(run, name="Times New Roman", size_pt=12, bold=True, color=BLACK)
-    elif level == 4:
-        run = p.add_run(text)
-        set_run_font(run, name="Times New Roman", size_pt=11, bold=True, italic=True, color=BLACK)
-    else:
-        run = p.add_run(text)
-        set_run_font(run, name="Times New Roman", size_pt=11, bold=True)
-    return p
-
-
-def make_callout_box(doc, lines):
-    """Render a blockquote as a callout box: 2-row, 1-column Word table.
-    Row 1 (header): dark red fill, white bold caps. Row 2 (body): light gray
-    fill, paragraphs preserved. This renders consistently across Word and
-    Pages — unlike shaded paragraphs with manual borders, which leave gaps
-    on the right edge and break under long text wraps."""
-    if not lines:
-        return
-    header_text = lines[0]
-    body_lines = lines[1:]
-    header_clean = re.sub(r"^\*\*(.+?)\*\*$", r"\1", header_text.strip())
-
-    table = doc.add_table(rows=2, cols=1)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = False
-    # Width: full content area (6.5" given Letter + 1" margins)
-    for row in table.rows:
-        for cell in row.cells:
-            cell.width = Inches(6.5)
-
-    # ---- Header row ----
-    hcell = table.rows[0].cells[0]
-    set_cell_shading(hcell, "8B0000")
-    set_cell_borders(hcell, "8B0000", "single", 12)
-    hcell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    hp = clear_cell(hcell)
-    hp.paragraph_format.space_before = Pt(3)
-    hp.paragraph_format.space_after = Pt(3)
-    hp.paragraph_format.line_spacing = 1.0
-    hrun = hp.add_run(header_clean.upper())
-    set_run_font(hrun, name="Times New Roman", size_pt=11, bold=True, color=WHITE, all_caps=True)
-
-    # ---- Body row ----
-    bcell = table.rows[1].cells[0]
-    set_cell_shading(bcell, LIGHT_GRAY)
-    set_cell_borders(bcell, "8B0000", "single", 12)
-    # First body paragraph: reuse the cell's existing one
-    first_par = clear_cell(bcell)
-    for idx, raw in enumerate(body_lines):
-        if idx == 0:
-            bp = first_par
-        else:
-            bp = bcell.add_paragraph()
-        bp.paragraph_format.space_before = Pt(3) if idx == 0 else Pt(2)
-        bp.paragraph_format.space_after = Pt(3) if idx == len(body_lines) - 1 else Pt(2)
-        bp.paragraph_format.line_spacing = 1.15
-        add_inline_runs(bp, raw, base_size=11)
-
-    # Spacer after the table so the next paragraph isn't flush against the border
-    spacer = doc.add_paragraph()
-    spacer.paragraph_format.space_before = Pt(0)
-    spacer.paragraph_format.space_after = Pt(4)
-
-
-TIGHT_LIST_THRESHOLD = 6  # Lists at or below this many items are kept together on one page
-
-
-def make_list(doc, items):
-    """Render a list of (kind, text) tuples. Tight lists (≤ TIGHT_LIST_THRESHOLD
-    items) get keep_with_next on every item except the last, so Word treats the
-    whole list as a single block and won't break it across pages. Longer lists
-    are allowed to flow naturally."""
-    tight = len(items) <= TIGHT_LIST_THRESHOLD
-    last_idx = len(items) - 1
-    for i, (kind, txt) in enumerate(items):
-        # Checklist items: text starts with ☐
-        if txt.startswith("☐"):
-            p = doc.add_paragraph()
-            p.paragraph_format.left_indent = Inches(0.25)
-            p.paragraph_format.first_line_indent = Inches(-0.25)
-            p.paragraph_format.space_after = Pt(3)
-            run = p.add_run("☐ ")
-            set_run_font(run, name="Times New Roman", size_pt=11)
-            remainder = txt[1:].lstrip()
-            add_inline_runs(p, remainder, base_size=11)
-            if tight and i < last_idx:
-                keep_with_next(p)
-            continue
-
-        p = doc.add_paragraph(style="List Bullet" if kind == "bullet" else "List Number")
-        p.paragraph_format.space_after = Pt(3)
-        for r in list(p.runs):
-            r.text = ""
-        add_inline_runs(p, txt, base_size=11)
-        if tight and i < last_idx:
-            keep_with_next(p)
-
-
-def make_paragraph(doc, text):
-    # Special handling: Phase transition labels like "**PHASE 1 → PHASE 2:**"
-    if text.startswith("**PHASE") and text.endswith("**"):
-        clean = text.strip("*")
-        p = doc.add_paragraph()
-        p.paragraph_format.space_before = Pt(12)
-        p.paragraph_format.space_after = Pt(3)
-        keep_with_next(p)
-        set_run_font(p.add_run(clean), name="Times New Roman", size_pt=11, bold=True, color=DARK_RED)
-        return
-
-    p = doc.add_paragraph()
-    p.paragraph_format.space_after = Pt(6)
-    p.paragraph_format.line_spacing = 1.15
-    add_inline_runs(p, text, base_size=11)
-
-
-def make_code_block(doc, lines):
-    """Render a code block. The URVI Figure 1 ASCII org chart gets special
-    treatment — detected by the presence of 'Unified Command' + 'Contact Team' —
-    and rendered as a structured table org chart instead."""
-    joined = "\n".join(lines)
-    if "Unified Command" in joined and "Contact Team" in joined and "RTF" in joined:
-        make_urvi_org_chart(doc)
-        return
-    for ln in lines:
-        p = doc.add_paragraph()
-        p.paragraph_format.space_after = Pt(0)
-        p.paragraph_format.line_spacing = 1.0
-        set_run_font(p.add_run(ln), name="Courier New", size_pt=9)
-
-
-def _box_cell(cell, title, subtitle=None, font_size=10, subtitle_size=9):
-    """Style a cell as an org-chart box: light gray fill, dark red border,
-    centered bold title with optional subtitle line."""
-    set_cell_shading(cell, LIGHT_GRAY)
-    set_cell_borders(cell, "8B0000", "single", 8)
-    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-    p = clear_cell(cell)
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(4)
-    p.paragraph_format.space_after = Pt(2 if subtitle else 4)
-    p.paragraph_format.line_spacing = 1.0
-    set_run_font(p.add_run(title), name="Times New Roman", size_pt=font_size, bold=True)
-    if subtitle:
-        p2 = cell.add_paragraph()
-        p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p2.paragraph_format.space_before = Pt(0)
-        p2.paragraph_format.space_after = Pt(4)
-        p2.paragraph_format.line_spacing = 1.0
-        set_run_font(p2.add_run(subtitle), name="Times New Roman", size_pt=subtitle_size, italic=False)
-
-
-def _connector_cell(cell):
-    """Style a cell as a no-border, no-fill cell with a centered vertical bar."""
-    set_cell_borders(cell, "FFFFFF", "nil")
-    p = clear_cell(cell)
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(0)
-    p.paragraph_format.line_spacing = 1.0
-    set_run_font(p.add_run("│"), name="Times New Roman", size_pt=12, bold=True, color=DARK_RED)
-
-
-def _blank_cell(cell):
-    set_cell_borders(cell, "FFFFFF", "nil")
-    clear_cell(cell)
-
-
-def make_urvi_org_chart(doc):
-    """Render the URVI command-structure org chart as a 5-row × 7-col table.
-    Spacer columns (1, 3, 5) give each node its own visible box with
-    whitespace between siblings — adjacent shaded cells with shared borders
-    would otherwise merge visually into one wide compartmentalized block.
-
-    Grid layout (B = box, S = spacer, V = vertical connector):
-        Col:  0   1   2   3   4   5   6
-        R0:   ┌────── Unified Command ──────┐
-        R1:   ┌─────────── │ ───────────────┐
-        R2:   ┌── Contact ──┐ S ┌── Rescue ──┐
-        R3:   V   .   V   .   V   .   V
-        R4:   B   .   B   .   B   .   B
-    """
-    table = doc.add_table(rows=5, cols=7)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = False
-
-    # Column widths — box columns are wider than spacer columns
-    # 4 boxes × 1.30" + 3 spacers × 0.43" = 5.20 + 1.29 = 6.49" (full content width)
-    BOX_W = 1.30
-    SPACER_W = 0.43
-    col_widths_in = [BOX_W, SPACER_W, BOX_W, SPACER_W, BOX_W, SPACER_W, BOX_W]
-
-    # Set grid widths so Word and Pages respect the layout
-    tblGrid = table._tbl.find(qn("w:tblGrid"))
-    gridCols = tblGrid.findall(qn("w:gridCol"))
-    for col, w_in in zip(gridCols, col_widths_in):
-        col.set(qn("w:w"), str(int(w_in * 1440)))  # inches → twips (1 inch = 1440)
-        col.set(qn("w:type"), "dxa")
-
-    # Also set each cell's preferred width
-    for row in table.rows:
-        for cell, w_in in zip(row.cells, col_widths_in):
-            cell.width = Inches(w_in)
-
-    # Row 0 — Unified Command (merged across all 7 columns)
-    r0 = table.rows[0]
-    top = r0.cells[0].merge(r0.cells[6])
-    _box_cell(top, "Unified Command", subtitle="(Law Enforcement / Fire / EMS)")
-
-    # Row 1 — vertical connector below Unified Command (merged across all 7)
-    r1 = table.rows[1]
-    conn1 = r1.cells[0].merge(r1.cells[6])
-    _connector_cell(conn1)
-
-    # Row 2 — Contact Group (cols 0-2), spacer (col 3), Rescue Group (cols 4-6)
-    r2 = table.rows[2]
-    contact = r2.cells[0].merge(r2.cells[2])
-    _box_cell(contact, "Contact Group", subtitle="(Supervisor)")
-    _blank_cell(r2.cells[3])
-    rescue = r2.cells[4].merge(r2.cells[6])
-    _box_cell(rescue, "Rescue Group", subtitle="(Supervisor)")
-
-    # Row 3 — vertical connectors above each leaf box; spacers in between
-    r3 = table.rows[3]
-    for idx, c in enumerate(r3.cells):
-        if idx in (0, 2, 4, 6):
-            _connector_cell(c)
-        else:
-            _blank_cell(c)
-
-    # Row 4 — four leaf boxes (CT1, CT2, RTF 1, RTF 2) separated by spacers
-    r4 = table.rows[4]
-    labels = ["Contact Team 1", "Contact Team 2", "RTF 1", "RTF 2"]
-    label_iter = iter(labels)
-    for idx, c in enumerate(r4.cells):
-        if idx in (0, 2, 4, 6):
-            _box_cell(c, next(label_iter), subtitle=None)
-        else:
-            _blank_cell(c)
-
-    # Trailing spacer paragraph so the caption isn't flush against the chart
-    spacer = doc.add_paragraph()
-    spacer.paragraph_format.space_before = Pt(0)
-    spacer.paragraph_format.space_after = Pt(6)
-
-
-def make_table(doc, lines):
-    """Parse and render a markdown table."""
-    rows = []
-    for ln in lines:
-        if re.match(r"^\s*\|?\s*:?-+", ln):  # separator row
-            continue
-        # Trim leading/trailing pipes
-        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
-        rows.append(cells)
-    if not rows:
-        return
-    ncols = max(len(r) for r in rows)
-    table = doc.add_table(rows=len(rows), cols=ncols)
-    table.style = "Light Grid Accent 1"
-    table.autofit = True
-    for i, row in enumerate(rows):
-        # Pad short rows
-        cells = row + [""] * (ncols - len(row))
-        for j, cell in enumerate(cells):
-            tc = table.rows[i].cells[j]
-            tc.text = ""
-            p = tc.paragraphs[0]
-            if i == 0:
-                # Header row: bold
-                add_inline_runs(p, cell, base_size=10, bold=True)
-            else:
-                add_inline_runs(p, cell, base_size=10)
-
-
-# ---------------------------------------------------------------------------
-# Header + footer
-# ---------------------------------------------------------------------------
-
-def add_page_number(paragraph):
-    """Insert a PAGE field into the given paragraph (right side after a tab)."""
-    run = paragraph.add_run()
-    fldChar1 = OxmlElement("w:fldChar")
-    fldChar1.set(qn("w:fldCharType"), "begin")
-    instrText = OxmlElement("w:instrText")
-    instrText.set(qn("xml:space"), "preserve")
-    instrText.text = " PAGE "
-    fldChar2 = OxmlElement("w:fldChar")
-    fldChar2.set(qn("w:fldCharType"), "end")
-    run._element.append(fldChar1)
-    run._element.append(instrText)
-    run._element.append(fldChar2)
-    set_run_font(run, name="Times New Roman", size_pt=10)
-
-
-def set_running_header(section, doc_title):
-    section.different_first_page_header_footer = True
-    # First-page header stays blank
-    first_header = section.first_page_header
-    for p in first_header.paragraphs:
-        for r in list(p.runs):
-            r.text = ""
-    # Regular header on pages 2+
-    header = section.header
-    header.is_linked_to_previous = False
-    # Use first paragraph
-    p = header.paragraphs[0]
-    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    # Clear any existing content
-    for r in list(p.runs):
-        r.text = ""
-    # Add title on left, tab, page number on right
-    pPr = p._element.get_or_add_pPr()
-    # Add tab stops: center and right (right at 6.5" given 1" margins on Letter)
-    tabs = OxmlElement("w:tabs")
-    tab_right = OxmlElement("w:tab")
-    tab_right.set(qn("w:val"), "right")
-    tab_right.set(qn("w:pos"), "9360")  # twips = 6.5 inches
-    tabs.append(tab_right)
-    pPr.append(tabs)
-    run = p.add_run(doc_title)
-    set_run_font(run, name="Times New Roman", size_pt=10)
-    p.add_run("\t")
-    add_page_number(p)
-
-
-# ---------------------------------------------------------------------------
-# Cover page
-# ---------------------------------------------------------------------------
-
-def build_cover_page(doc):
-    # The cover page is the first section. Add several blank paragraphs to push title down a bit.
-    for _ in range(6):
-        doc.add_paragraph()
-
-    p_title = doc.add_paragraph()
-    p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_title.paragraph_format.space_after = Pt(18)
-    set_run_font(p_title.add_run("UNIFIED RESPONSE TO VIOLENT INCIDENTS (URVI)"), name="Times New Roman", size_pt=18, bold=True, color=DARK_RED)
-
-    p_sub = doc.add_paragraph()
-    p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_sub.paragraph_format.space_after = Pt(36)
-    set_run_font(p_sub.add_run("Framework for Los Angeles County Operational Guidelines"), name="Times New Roman", size_pt=13, italic=True, color=BLACK)
-
-    p_prep = doc.add_paragraph()
-    p_prep.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    set_run_font(p_prep.add_run("Prepared by the URVI Guidelines Committee"), name="Times New Roman", size_pt=11)
-
-    p_org = doc.add_paragraph()
-    p_org.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_org.paragraph_format.space_after = Pt(0)
-    set_run_font(p_org.add_run("Los Angeles County Public Safety Agencies"), name="Times New Roman", size_pt=11)
-
-    # Vertical gap
-    for _ in range(8):
-        doc.add_paragraph()
-
-    p_ver = doc.add_paragraph()
-    p_ver.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    set_run_font(p_ver.add_run("Version 1.0 | Effective: [DATE]"), name="Times New Roman", size_pt=10)
-
-
-# ---------------------------------------------------------------------------
 # Main assembly
 # ---------------------------------------------------------------------------
+
+def is_abstract_heading(text):
+    return text.strip().lower() == "abstract"
+
+
+def is_references_heading(text):
+    return text.strip().lower() == "references"
+
 
 def main():
     with open(SOURCE, "r", encoding="utf-8") as f:
         md = f.read()
 
-    # Stop before the "## Completion Checklist" — that's audit/polish metadata, not body content.
-    # Also stop before "## Layout Notes for Final Assembly" — those are instructions for THIS step.
-    cutoff_idx = md.find("\n## Layout Notes for Final Assembly")
-    if cutoff_idx == -1:
-        cutoff_idx = md.find("\n## Completion Checklist")
-    if cutoff_idx != -1:
-        md = md[:cutoff_idx]
-
     blocks = parse_markdown(md)
 
     doc = Document()
 
-    # Configure section: Letter, 1" margins
+    # Page setup: Letter, 1" margins
     section = doc.sections[0]
     section.page_height = Inches(11)
     section.page_width = Inches(8.5)
@@ -751,186 +538,134 @@ def main():
     section.right_margin = Inches(1)
 
     # Default style
-    styles = doc.styles
-    normal = styles["Normal"]
-    normal.font.name = "Times New Roman"
-    normal.font.size = Pt(11)
+    normal = doc.styles["Normal"]
+    normal.font.name = FONT_NAME
+    normal.font.size = Pt(FONT_SIZE_BODY)
 
-    # ----- Cover Page -----
-    build_cover_page(doc)
+    # Running header (APA: all pages including title page)
+    set_running_header(section)
+
+    # Title page
+    build_title_page(doc)
+
+    # Page break → abstract page
     add_page_break(doc)
 
-    # ----- Body -----
-    # Running header on pages 2+, none on cover (different_first_page_header_footer)
-    set_running_header(section, "Unified Response to Violent Incidents (URVI)")
+    # --- Parse and render body ---
+    # Track state
+    in_references = False
+    abstract_mode = False  # abstract paragraph not indented
+    title_seen = False      # skip the H1 doc title (already on title page)
+    keywords_next = False   # next paragraph after abstract is keywords line
 
-    h2_count = 0
-    skip_first_h1 = False
-    in_plaintext_toc = False  # When true, suppress blocks (we replaced TOC with a field)
-    body_started = False  # Suppress source's cover-duplicate paragraph before first H2
-    last_heading_text = None  # Used to drop a paragraph that just re-states the heading
+    for blk in blocks:
+        if blk.kind == "hr":
+            continue
 
-    def next_visible_block(start_idx):
-        """Return the next block from start_idx onward that would actually
-        render. Used to peek for tight-list followers."""
-        for j in range(start_idx, len(blocks)):
-            b = blocks[j]
-            if b.kind == "hr":
-                continue
-            return b
-        return None
-
-    for idx, blk in enumerate(blocks):
         if blk.kind == "heading":
-            last_heading_text = blk.text.strip().upper()
-            if blk.level == 1:
-                # The first H1 is the doc title — already rendered as cover; skip it.
-                if not skip_first_h1:
-                    skip_first_h1 = True
-                    continue
-                in_plaintext_toc = False
-                make_heading(doc, blk.text, 1, is_first_h2=False)
-            elif blk.level == 2:
-                # Detect numbered major sections (e.g., "1. EXECUTIVE SUMMARY", "TABLE OF CONTENTS", "FIGURE 1: ...")
-                in_plaintext_toc = False
-                body_started = True
-                is_first_h2 = (h2_count == 0)
-                make_heading(doc, blk.text, 2, is_first_h2=is_first_h2)
-                h2_count += 1
-                if blk.text.strip().upper() == "TABLE OF CONTENTS":
-                    # Insert a Word auto-TOC field and force a page break afterward so
-                    # the first body section starts at the top of a fresh page. This
-                    # is the only forced page break inside the body — section flow
-                    # otherwise pages naturally so short sections don't strand whitespace.
-                    add_toc_field(doc)
-                    add_page_break(doc)
-                    in_plaintext_toc = True
-            else:
-                make_heading(doc, blk.text, blk.level, is_first_h2=False)
-        elif not body_started:
-            # Everything before the first H2 is cover-duplicate content (subtitle,
-            # "Prepared by...", agency line) — already rendered on the cover page.
-            continue
-        elif in_plaintext_toc:
-            # Skip any blocks that are part of the original plain-text TOC
-            continue
-        elif blk.kind == "para":
-            # Drop a paragraph that just re-states the heading immediately above
-            # (e.g., "**FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION**" right after
-            # the H2 of the same name in the source).
-            stripped = blk.text.strip().strip("*").upper()
-            if last_heading_text and stripped == last_heading_text:
+            level = blk.level
+            text = blk.text.strip()
+
+            # H1: document title — skip (already on title page)
+            if level == 1:
+                if not title_seen:
+                    title_seen = True
                 continue
-            make_paragraph(doc, blk.text)
-            # If this paragraph introduces a tight list (ends with ":" and the
-            # next block is a list of ≤ TIGHT_LIST_THRESHOLD items), bind it to
-            # that list so Word keeps the lead-in on the same page as its items.
-            if blk.text.rstrip().endswith(":"):
-                nxt = next_visible_block(idx + 1)
-                if nxt is not None and nxt.kind == "list" and len(nxt.items) <= TIGHT_LIST_THRESHOLD:
-                    keep_with_next(doc.paragraphs[-1])
-        elif blk.kind == "list":
-            make_list(doc, blk.items)
-        elif blk.kind == "blockquote":
-            make_callout_box(doc, blk.lines)
-        elif blk.kind == "code":
-            make_code_block(doc, blk.lines)
-        elif blk.kind == "table":
-            make_table(doc, blk.lines)
-        elif blk.kind == "hr":
-            # Treat as visual separator — small spacing paragraph; suppress consecutive HRs
+
+            if is_abstract_heading(text):
+                abstract_mode = True
+                in_references = False
+                # Abstract heading: centered bold (APA Level 1)
+                make_heading(doc, text, 2)
+                keywords_next = False
+                continue
+
+            if is_references_heading(text):
+                in_references = True
+                abstract_mode = False
+                make_heading(doc, text, 2)
+                continue
+
+            abstract_mode = False
+            in_references = False
+            make_heading(doc, text, level)
             continue
 
-    # ----- Auto-update fields on open (populates the TOC field) -----
+        if blk.kind == "para":
+            text = blk.text.strip()
+            if not text:
+                continue
+
+            # Keywords line (italic "Keywords:" prefix)
+            if text.lower().startswith("*keywords:*") or text.lower().startswith("keywords:"):
+                kp = doc.add_paragraph()
+                set_double_spacing(kp)
+                kp.paragraph_format.first_line_indent = INDENT_FIRST_LINE
+                add_inline_runs(kp, text)
+                continue
+
+            if in_references:
+                # Reference entries: hanging indent, no first-line indent
+                make_paragraph(doc, text, indent=False, hanging=True)
+                continue
+
+            if abstract_mode:
+                # Abstract: no first-line indent (APA style)
+                make_paragraph(doc, text, indent=False)
+                continue
+
+            make_paragraph(doc, text, indent=True)
+            continue
+
+        if blk.kind == "list":
+            make_list(doc, blk.items)
+            continue
+
+        if blk.kind == "table":
+            make_table(doc, blk.lines)
+            continue
+
+        if blk.kind == "code":
+            make_code_block(doc, blk.lines)
+            continue
+
     enable_auto_update_fields(doc)
 
-    # ----- Save -----
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     doc.save(OUTPUT)
     print(f"Saved: {OUTPUT}")
 
-    # ----- Self-verify -----
+    # Verify
     assert os.path.exists(OUTPUT), "File not created"
     size = os.path.getsize(OUTPUT)
     assert size > 5000, f"File too small: {size} bytes"
+
     doc2 = Document(OUTPUT)
     headings = [p for p in doc2.paragraphs if p.style.name.startswith("Heading")]
+    word_count = len(" ".join(p.text for p in doc2.paragraphs).split())
     print(f"File size: {size:,} bytes")
     print(f"Total paragraphs: {len(doc2.paragraphs)}")
-    print(f"Headings detected (built-in style): {len(headings)}")
+    print(f"Headings: {len(headings)}")
     print(f"Tables: {len(doc2.tables)}")
-
-    # Word counts for sanity
-    total_text = "\n".join(p.text for p in doc2.paragraphs)
-    word_count = len(total_text.split())
     print(f"Estimated word count: {word_count}")
-    # Estimate pages ~ 350 words/page for Times New Roman 11pt 1.15 spacing
-    est_pages = max(1, (word_count // 350) + 4)  # +cover, +TOC, +figure, +section page breaks
+    est_pages = max(1, word_count // 250)
     print(f"Estimated pages: ~{est_pages}")
 
-    # ----- PDF export -----
-    pdf_path = os.path.abspath(OUTPUT.replace(".docx", ".pdf"))
-    docx_abs = os.path.abspath(OUTPUT)
-    if export_pdf_via_word(docx_abs, pdf_path):
-        print(f"PDF generated: {pdf_path}")
-    else:
-        print("PDF conversion not available — open the .docx in Word and use File → Save As → PDF.")
-
-
-def export_pdf_via_word(docx_abs, pdf_abs):
-    """Convert .docx → .pdf. Tries (1) Word + update-fields, (2) Pages export.
-    Falls back gracefully if both fail."""
-    import subprocess
-
-    # Step 1: open the doc in Word and update fields so the TOC is populated.
-    # This Word version's AppleScript dictionary rejects `save as PDF` but
-    # accepts `update fields` and `save`. We refresh fields and re-save the
-    # docx, then hand off to a different tool for the PDF.
-    refresh_script = f'''
-    tell application "Microsoft Word"
-        activate
-        open file name "{docx_abs}"
-        set theDoc to active document
-        update fields theDoc
-        save theDoc
-        close theDoc saving no
-    end tell
-    '''
+    # PDF via LibreOffice
     try:
         result = subprocess.run(
-            ["osascript", "-e", refresh_script],
-            capture_output=True, text=True, timeout=120
+            ["libreoffice", "--headless", "--convert-to", "pdf",
+             "--outdir", "restoration_project", OUTPUT],
+            capture_output=True, timeout=60
         )
-        if result.returncode != 0:
-            print(f"Word field refresh stderr: {result.stderr.strip()}")
+        pdf_path = OUTPUT.replace(".docx", ".pdf")
+        if result.returncode == 0 and os.path.exists(pdf_path):
+            print(f"PDF generated: {pdf_path}")
         else:
-            print("Word field refresh: TOC populated and .docx re-saved.")
+            print("LibreOffice not available — open .docx in Word → File → Save As → PDF.")
     except Exception as e:
-        print(f"Word refresh failed: {e}")
-
-    # Step 2: PDF export via Pages (well-supported AppleScript export to PDF)
-    pages_script = f'''
-    tell application "Pages"
-        activate
-        set theDoc to open (POSIX file "{docx_abs}")
-        delay 2
-        export theDoc to (POSIX file "{pdf_abs}") as PDF
-        close theDoc saving no
-    end tell
-    '''
-    try:
-        result = subprocess.run(
-            ["osascript", "-e", pages_script],
-            capture_output=True, text=True, timeout=120
-        )
-        if result.returncode == 0 and os.path.exists(pdf_abs):
-            print("PDF exported via Pages.")
-            return True
-        print(f"Pages export stderr: {result.stderr.strip()}")
-    except Exception as e:
-        print(f"Pages export failed: {e}")
-
-    return False
+        print(f"PDF conversion skipped: {e}")
+        print("Open .docx in Word → File → Save As → PDF.")
 
 
 if __name__ == "__main__":
