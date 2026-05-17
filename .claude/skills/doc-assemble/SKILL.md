@@ -64,9 +64,15 @@ Write a complete Python script that:
 
    **Inline parsing must use ordered-alternation regex** so `**bold**` is consumed as bold before its inner content matches the `*italic*` rule. A naïve `*[^*]+*` pattern run first will eat the inner half of every bold run. Reference pattern: `(\*\*[^*]+\*\*|`[^`]+`|\*[^*\n]+?\*)` with bold matched first. Italic uses non-greedy single-line matching so an unmatched asterisk in a long paragraph doesn't swallow downstream text.
 
-2. **Applies document type styling** (from WORK_ORDER.md):
+2. **Derives styling from the document's actual context** — in this order of priority:
 
-   **Corporate / Government:**
+   1. **Layout Notes in `06_formatted.md`** (highest priority) — the Painter captured the document's real design decisions: colors, fonts, spacing, callout box specs, accent colors, special elements. These always override the baseline defaults below.
+   2. **WORK_ORDER.md** — the document type and any user-stated style preferences.
+   3. **Baseline defaults by document type** (lowest priority — fallback only for properties not specified above):
+
+   > **Important:** Colors, accent schemes, callout boxes, special borders, and any other design element documented in the Layout Notes or visible in the original document are part of the document's identity — apply them faithfully. Do not strip design choices based on document type assumptions.
+
+   **Corporate / Government baseline:**
    - Font: Times New Roman, 11pt body
    - Heading 1: Times New Roman 18pt, bold, dark red (#8B0000) — used for the cover title only
    - Heading 2 (numbered sections): Times New Roman 14pt, bold, ALL CAPS, black, with 1pt dark red horizontal rule below; `keep_with_next` = True
