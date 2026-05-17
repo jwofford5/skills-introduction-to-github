@@ -8,9 +8,10 @@ import re
 import sys
 from copy import deepcopy
 from docx import Document
-from docx.shared import Pt, Inches, RGBColor, Cm
+from docx.shared import Pt, Inches, RGBColor, Cm, Emu
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.enum.section import WD_SECTION
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml.ns import qn, nsmap
 from docx.oxml import OxmlElement
 
@@ -181,10 +182,11 @@ def set_run_font(run, name="Times New Roman", size_pt=11, bold=False, italic=Fal
 
 def add_inline_runs(paragraph, text, base_font="Times New Roman", base_size=11, bold=False, italic=False, color=None):
     """Handle inline **bold**, *italic*, `code` within a paragraph text."""
-    # Split on **bold** and `code` and *italic*
-    # Tokens: (text, is_bold, is_italic, is_code)
+    # Bold is checked before italic so `**text**` is not parsed as a pair of italics.
+    # Italic uses a non-greedy match restricted to a single line so an unmatched
+    # asterisk in a long paragraph doesn't swallow content.
     tokens = []
-    pattern = re.compile(r"(\*\*[^*]+\*\*|`[^`]+`)")
+    pattern = re.compile(r"(\*\*[^*]+\*\*|`[^`]+`|\*[^*\n]+?\*)")
     pos = 0
     for m in pattern.finditer(text):
         if m.start() > pos:
@@ -194,6 +196,8 @@ def add_inline_runs(paragraph, text, base_font="Times New Roman", base_size=11, 
             tokens.append((tok[2:-2], True, False, False))
         elif tok.startswith("`"):
             tokens.append((tok[1:-1], False, False, True))
+        else:  # single-asterisk italic
+            tokens.append((tok[1:-1], False, True, False))
         pos = m.end()
     if pos < len(text):
         tokens.append((text[pos:], False, False, False))
@@ -215,6 +219,45 @@ def shade_paragraph(paragraph, hex_color):
     shd.set(qn("w:color"), "auto")
     shd.set(qn("w:fill"), hex_color)
     pPr.append(shd)
+
+
+def set_cell_shading(cell, hex_color):
+    tcPr = cell._tc.get_or_add_tcPr()
+    for existing in tcPr.findall(qn("w:shd")):
+        tcPr.remove(existing)
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), hex_color)
+    tcPr.append(shd)
+
+
+def set_cell_borders(cell, hex_color="8B0000", style="single", size=8, sides=("top", "left", "bottom", "right")):
+    tcPr = cell._tc.get_or_add_tcPr()
+    for existing in tcPr.findall(qn("w:tcBorders")):
+        tcPr.remove(existing)
+    tcBorders = OxmlElement("w:tcBorders")
+    for side in sides:
+        el = OxmlElement(f"w:{side}")
+        if style == "nil":
+            el.set(qn("w:val"), "nil")
+        else:
+            el.set(qn("w:val"), style)
+            el.set(qn("w:sz"), str(size))
+            el.set(qn("w:color"), hex_color)
+        tcBorders.append(el)
+    tcPr.append(tcBorders)
+
+
+def clear_cell(cell):
+    """Empty a cell's first paragraph and return it for re-use."""
+    p = cell.paragraphs[0]
+    for r in list(p.runs):
+        r.text = ""
+    # Remove other paragraphs
+    for extra in list(cell.paragraphs[1:]):
+        extra._element.getparent().remove(extra._element)
+    return p
 
 
 def add_paragraph_border(paragraph, position, size=8, color="8B0000"):
@@ -299,8 +342,10 @@ def make_heading(doc, text, level, is_first_h2):
     style_name = f"Heading {min(level, 9)}"
     p = doc.add_paragraph(style=style_name)
     pf = p.paragraph_format
-    pf.space_before = Pt(12)
-    pf.space_after = Pt(6)
+    # Spacing: enough to set headings apart visually but not so much it leaves big gaps
+    pf.space_before = Pt(14) if level <= 2 else Pt(10)
+    pf.space_after = Pt(4)
+    # keep_with_next stops a heading from being stranded at the bottom of a page
     keep_with_next(p)
 
     if level == 1:
@@ -311,8 +356,7 @@ def make_heading(doc, text, level, is_first_h2):
         run = p.add_run(text.upper())
         set_run_font(run, name="Times New Roman", size_pt=14, bold=True, color=BLACK, all_caps=True)
         add_paragraph_border(p, "bottom", size=6, color="8B0000")
-        if not is_first_h2:
-            set_page_break_before(p)
+        # No forced page break — let content flow naturally
     elif level == 3:
         run = p.add_run(text)
         set_run_font(run, name="Times New Roman", size_pt=12, bold=True, color=BLACK)
@@ -326,37 +370,57 @@ def make_heading(doc, text, level, is_first_h2):
 
 
 def make_callout_box(doc, lines):
-    """Render a blockquote as a callout: dark red header row + light gray body."""
+    """Render a blockquote as a callout box: 2-row, 1-column Word table.
+    Row 1 (header): dark red fill, white bold caps. Row 2 (body): light gray
+    fill, paragraphs preserved. This renders consistently across Word and
+    Pages — unlike shaded paragraphs with manual borders, which leave gaps
+    on the right edge and break under long text wraps."""
     if not lines:
         return
-    # First line is treated as the header (UPPERCASE label like "**THE THREE-PHASE..."**)
     header_text = lines[0]
     body_lines = lines[1:]
-    # Strip leading bold markers from header
     header_clean = re.sub(r"^\*\*(.+?)\*\*$", r"\1", header_text.strip())
 
-    # Header paragraph
-    p_head = doc.add_paragraph()
-    p_head.paragraph_format.space_before = Pt(6)
-    p_head.paragraph_format.space_after = Pt(0)
-    keep_with_next(p_head)
-    set_run_font(p_head.add_run(header_clean.upper()), name="Times New Roman", size_pt=11, bold=True, color=WHITE, all_caps=True)
-    shade_paragraph(p_head, "8B0000")
-    add_paragraph_border(p_head, "top", size=12, color="8B0000")
-    add_paragraph_border(p_head, "left", size=12, color="8B0000")
-    add_paragraph_border(p_head, "right", size=12, color="8B0000")
+    table = doc.add_table(rows=2, cols=1)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
+    # Width: full content area (6.5" given Letter + 1" margins)
+    for row in table.rows:
+        for cell in row.cells:
+            cell.width = Inches(6.5)
 
-    # Body paragraphs
+    # ---- Header row ----
+    hcell = table.rows[0].cells[0]
+    set_cell_shading(hcell, "8B0000")
+    set_cell_borders(hcell, "8B0000", "single", 12)
+    hcell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    hp = clear_cell(hcell)
+    hp.paragraph_format.space_before = Pt(3)
+    hp.paragraph_format.space_after = Pt(3)
+    hp.paragraph_format.line_spacing = 1.0
+    hrun = hp.add_run(header_clean.upper())
+    set_run_font(hrun, name="Times New Roman", size_pt=11, bold=True, color=WHITE, all_caps=True)
+
+    # ---- Body row ----
+    bcell = table.rows[1].cells[0]
+    set_cell_shading(bcell, LIGHT_GRAY)
+    set_cell_borders(bcell, "8B0000", "single", 12)
+    # First body paragraph: reuse the cell's existing one
+    first_par = clear_cell(bcell)
     for idx, raw in enumerate(body_lines):
-        p_body = doc.add_paragraph()
-        p_body.paragraph_format.space_before = Pt(0)
-        p_body.paragraph_format.space_after = Pt(3 if idx < len(body_lines) - 1 else 6)
-        add_inline_runs(p_body, raw, base_size=11)
-        shade_paragraph(p_body, LIGHT_GRAY)
-        add_paragraph_border(p_body, "left", size=12, color="8B0000")
-        add_paragraph_border(p_body, "right", size=12, color="8B0000")
-        if idx == len(body_lines) - 1:
-            add_paragraph_border(p_body, "bottom", size=12, color="8B0000")
+        if idx == 0:
+            bp = first_par
+        else:
+            bp = bcell.add_paragraph()
+        bp.paragraph_format.space_before = Pt(3) if idx == 0 else Pt(2)
+        bp.paragraph_format.space_after = Pt(3) if idx == len(body_lines) - 1 else Pt(2)
+        bp.paragraph_format.line_spacing = 1.15
+        add_inline_runs(bp, raw, base_size=11)
+
+    # Spacer after the table so the next paragraph isn't flush against the border
+    spacer = doc.add_paragraph()
+    spacer.paragraph_format.space_before = Pt(0)
+    spacer.paragraph_format.space_after = Pt(4)
 
 
 def make_list(doc, items):
@@ -403,12 +467,104 @@ def make_paragraph(doc, text):
 
 
 def make_code_block(doc, lines):
-    """Render a code block (used for the ASCII org chart in Figure 1)."""
+    """Render a code block. The URVI Figure 1 ASCII org chart gets special
+    treatment — detected by the presence of 'Unified Command' + 'Contact Team' —
+    and rendered as a structured table org chart instead."""
+    joined = "\n".join(lines)
+    if "Unified Command" in joined and "Contact Team" in joined and "RTF" in joined:
+        make_urvi_org_chart(doc)
+        return
     for ln in lines:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(0)
         p.paragraph_format.line_spacing = 1.0
         set_run_font(p.add_run(ln), name="Courier New", size_pt=9)
+
+
+def _box_cell(cell, title, subtitle=None, font_size=10, subtitle_size=9):
+    """Style a cell as an org-chart box: light gray fill, dark red border,
+    centered bold title with optional subtitle line."""
+    set_cell_shading(cell, LIGHT_GRAY)
+    set_cell_borders(cell, "8B0000", "single", 8)
+    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    p = clear_cell(cell)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(4)
+    p.paragraph_format.space_after = Pt(2 if subtitle else 4)
+    p.paragraph_format.line_spacing = 1.0
+    set_run_font(p.add_run(title), name="Times New Roman", size_pt=font_size, bold=True)
+    if subtitle:
+        p2 = cell.add_paragraph()
+        p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p2.paragraph_format.space_before = Pt(0)
+        p2.paragraph_format.space_after = Pt(4)
+        p2.paragraph_format.line_spacing = 1.0
+        set_run_font(p2.add_run(subtitle), name="Times New Roman", size_pt=subtitle_size, italic=False)
+
+
+def _connector_cell(cell):
+    """Style a cell as a no-border, no-fill cell with a centered vertical bar."""
+    set_cell_borders(cell, "FFFFFF", "nil")
+    p = clear_cell(cell)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.line_spacing = 1.0
+    set_run_font(p.add_run("│"), name="Times New Roman", size_pt=12, bold=True, color=DARK_RED)
+
+
+def _blank_cell(cell):
+    set_cell_borders(cell, "FFFFFF", "nil")
+    clear_cell(cell)
+
+
+def make_urvi_org_chart(doc):
+    """Render the URVI command-structure org chart as a 5-row × 4-col table:
+       Row 0: Unified Command (spans 4)
+       Row 1: vertical connector (spans 4)
+       Row 2: Contact Group (cols 0-1) | Rescue Group (cols 2-3)
+       Row 3: four connectors, one per leaf box
+       Row 4: Contact Team 1 | Contact Team 2 | RTF 1 | RTF 2
+    """
+    table = doc.add_table(rows=5, cols=4)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
+    for row in table.rows:
+        for cell in row.cells:
+            cell.width = Inches(1.5)
+
+    # Row 0 — top box (merged across all 4 columns)
+    r0 = table.rows[0]
+    top = r0.cells[0].merge(r0.cells[3])
+    _box_cell(top, "Unified Command", subtitle="(Law Enforcement / Fire / EMS)")
+
+    # Row 1 — single vertical connector under the top box
+    r1 = table.rows[1]
+    conn1 = r1.cells[0].merge(r1.cells[3])
+    _connector_cell(conn1)
+
+    # Row 2 — two supervisor boxes
+    r2 = table.rows[2]
+    contact = r2.cells[0].merge(r2.cells[1])
+    _box_cell(contact, "Contact Group", subtitle="(Supervisor)")
+    rescue = r2.cells[2].merge(r2.cells[3])
+    _box_cell(rescue, "Rescue Group", subtitle="(Supervisor)")
+
+    # Row 3 — connectors above each of the 4 leaf boxes
+    r3 = table.rows[3]
+    for c in r3.cells:
+        _connector_cell(c)
+
+    # Row 4 — four leaf boxes
+    r4 = table.rows[4]
+    labels = ["Contact Team 1", "Contact Team 2", "RTF 1", "RTF 2"]
+    for cell, label in zip(r4.cells, labels):
+        _box_cell(cell, label, subtitle=None)
+
+    # Spacer after the chart
+    spacer = doc.add_paragraph()
+    spacer.paragraph_format.space_before = Pt(0)
+    spacer.paragraph_format.space_after = Pt(6)
 
 
 def make_table(doc, lines):
@@ -575,8 +731,10 @@ def main():
     skip_first_h1 = False
     in_plaintext_toc = False  # When true, suppress blocks (we replaced TOC with a field)
     body_started = False  # Suppress source's cover-duplicate paragraph before first H2
+    last_heading_text = None  # Used to drop a paragraph that just re-states the heading
     for blk in blocks:
         if blk.kind == "heading":
+            last_heading_text = blk.text.strip().upper()
             if blk.level == 1:
                 # The first H1 is the doc title — already rendered as cover; skip it.
                 if not skip_first_h1:
@@ -592,7 +750,9 @@ def main():
                 make_heading(doc, blk.text, 2, is_first_h2=is_first_h2)
                 h2_count += 1
                 if blk.text.strip().upper() == "TABLE OF CONTENTS":
-                    # Insert a Word auto-TOC field; suppress the source's plain-text list
+                    # Insert a Word auto-TOC field; suppress the source's plain-text list.
+                    # No forced page break afterward — body content flows naturally so we
+                    # don't strand half-empty pages.
                     add_toc_field(doc)
                     in_plaintext_toc = True
             else:
@@ -605,6 +765,12 @@ def main():
             # Skip any blocks that are part of the original plain-text TOC
             continue
         elif blk.kind == "para":
+            # Drop a paragraph that just re-states the heading immediately above
+            # (e.g., "**FIGURE 1: EXAMPLE BASIC URVI ORGANIZATION**" right after
+            # the H2 of the same name in the source).
+            stripped = blk.text.strip().strip("*").upper()
+            if last_heading_text and stripped == last_heading_text:
+                continue
             make_paragraph(doc, blk.text)
         elif blk.kind == "list":
             make_list(doc, blk.items)
