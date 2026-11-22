@@ -957,7 +957,7 @@ def cmd_render():
            "-i", os.path.join(FRAMES, "f_%06d.png"), "-stream_loop", "-1" if own else "0", "-i", audio,
            "-vf", "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p",
            "-af", "afade=t=in:d=3,afade=t=out:st=%.2f:d=6" % (TOTAL - 6.5),
-           "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-pix_fmt", "yuv420p",
            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
            "-r", str(FPS), "-c:a", "aac", "-b:a", "192k", "-t", "%.3f" % TOTAL,
            "-movflags", "+faststart", OUT]
